@@ -1,0 +1,4 @@
+# 版本查询服务
+---
+int32 soft_version       # 软件版本号
+uint8 powerboard_version # 电源板版本号(cmd[3])

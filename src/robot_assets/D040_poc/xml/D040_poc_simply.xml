@@ -1,0 +1,227 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mujoco model="d4">
+  <!-- ============================================ -->
+  <!-- D4 MuJoCo Model for rl_sar_mujoco          -->
+  <!-- Based on zlzk/robot_description/d4_mjcf/d4  -->
+  <!-- Fixed: actuator ctrlrange, added sensor,    -->
+  <!--         added collision geom, added foot sites -->
+  <!-- ============================================ -->
+  <compiler angle="radian" meshdir="../meshes/" autolimits="true"/>
+  <option cone="pyramidal" impratio="5" gravity="0 0 -9.81" timestep="0.002" iterations="100" ls_iterations="50"/>
+
+  <!-- ============================================ -->
+  <!-- 1. Asset: 几何网格定义                      -->
+  <!-- ============================================ -->
+  <asset>
+    <mesh name="torso_link" file="base_link.STL"/>
+    <mesh name="left_front_hip_roll_link" file="FL_hip.STL"/>
+    <mesh name="left_front_hip_pitch_link" file="FL_thigh.STL"/>
+    <mesh name="left_front_knee_link" file="FL_calf.STL"/>
+    <mesh name="left_front_foot_fixed_link" file="FL_foot.STL"/>
+    <mesh name="right_front_hip_roll_link" file="FR_hip.STL"/>
+    <mesh name="right_front_hip_pitch_link" file="FR_thigh.STL"/>
+    <mesh name="right_front_knee_link" file="FR_calf.STL"/>
+    <mesh name="right_front_foot_fixed_link" file="FR_foot.STL"/>
+    <mesh name="left_rear_hip_roll_link" file="RL_hip.STL"/>
+    <mesh name="left_rear_hip_pitch_link" file="RL_thigh.STL"/>
+    <mesh name="left_rear_knee_link" file="RL_calf.STL"/>
+    <mesh name="left_rear_foot_fixed_link" file="RL_foot.STL"/>
+    <mesh name="right_rear_hip_roll_link" file="RR_hip.STL"/>
+    <mesh name="right_rear_hip_pitch_link" file="RR_thigh.STL"/>
+    <mesh name="right_rear_knee_link" file="RR_calf.STL"/>
+    <mesh name="right_rear_foot_fixed_link" file="RR_foot.STL"/>
+    <material name="torso_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+    <material name="left_front_hip_roll_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+    <material name="left_front_hip_pitch_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+    <material name="left_front_knee_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+    <material name="left_front_foot_fixed_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+    <material name="right_front_hip_roll_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+    <material name="right_front_hip_pitch_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+    <material name="right_front_knee_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+    <material name="right_front_foot_fixed_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+    <material name="left_rear_hip_roll_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+    <material name="left_rear_hip_pitch_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+    <material name="left_rear_knee_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+    <material name="left_rear_foot_fixed_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+    <material name="right_rear_hip_roll_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+    <material name="right_rear_hip_pitch_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+    <material name="right_rear_knee_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+    <material name="right_rear_foot_fixed_link_mat" rgba="0.5922 0.6667 0.6824 1" specular="0"/>
+  </asset>
+
+  <!-- ============================================ -->
+  <!-- 2. Worldbody: 机器人模型                    -->
+  <!-- ============================================ -->
+  <worldbody>
+    <!-- 机器人基座 (初始站立高度 0.52m，与 keyframe/home 一致) -->
+    <body name="torso_link" pos="0 0 0.52">
+      <freejoint/>
+      <!-- IMU 传感器站点（位于基座中心上方 0.05m）-->
+      <site name="imu" pos="0 0 0.05" size="0.001"/>
+
+      <!-- 基座惯性 (来自 CAD) -->
+      <inertial pos="-0.0005167 0.0021999 -0.0110846" mass="17.0274" fullinertia="0.150396 0.326513 0.41029 -0.0009831 0.0006199 -0.0012699"/>
+
+      <!-- 基座视觉网格 -->
+      <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="torso_link_mat" type="mesh" mesh="torso_link"/>
+
+      <!-- 基座碰撞几何体 (用于摔倒检测) -->
+      <geom pos="0 0 0.005" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="box" size="0.13 0.128 0.07"/>
+
+      <!-- ==================== left_front_foot_site (前左腿) ==================== -->
+      <body name="left_front_hip_roll_link" pos="0.257 0.088 -0.011">
+        <joint name="left_front_hip_roll" type="hinge" axis="1 0 0" limited="true" range="-1.01 1.01" damping="0" frictionloss="0" armature="0.0318"/>
+        <inertial pos="-0.0027633 -0.0224872 0.0000408" mass="1.28105" fullinertia="0.0013247 0.0020035 0.0016402 0.0000743 -0.0000002 -0.0000009"/>
+        <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="left_front_hip_roll_link_mat" type="mesh" mesh="left_front_hip_roll_link"/>
+        <!-- 髋关节碰撞几何体 -->
+        <geom pos="0 -0.03 0" quat="0.7071068 0.7071068 0 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="cylinder" size="0.05 0.03"/>
+
+        <!-- 肩部装饰 (纯视觉) -->
+        <body name="left_front_hip_fixed_link" pos="0 0.103 0">
+          <geom pos="0 -0.0045 0" quat="0.7071068 0.7071068 0 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="cylinder" size="0.06 0.03"/>
+        </body>
+
+        <!-- 大腿连杆 -->
+        <body name="left_front_hip_pitch_link" pos="0 0.103 0">
+          <joint name="left_front_hip_pitch" type="hinge" axis="0 1 0" limited="true" range="-1.74 3.31" damping="0" frictionloss="0" armature="0.0638"/>
+          <inertial pos="-0.0047811 -0.0215666 -0.0465094" mass="2.83042" fullinertia="0.0214758 0.0209993 0.0044504 0.0002864 -0.0017292 0.0028614"/>
+          <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="left_front_hip_pitch_link_mat" type="mesh" mesh="left_front_hip_pitch_link"/>
+          <!-- 大腿碰撞几何体  -->
+          <geom pos="-0.01 0 -0.1575" quat="0.6819984 0 0.7313537 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="box" size="0.1 0.021 0.0325"/>
+
+          <!-- 小腿连杆 -->
+          <body name="left_front_knee_link" pos="0 0 -0.275">
+            <joint name="left_front_knee" type="hinge" axis="0 1 0" limited="true" range="-2.77 -1.04" damping="0" frictionloss="0" armature="0.1436"/>
+            <inertial pos="0.0091543 -0.0000064 -0.102004" mass="0.365288" fullinertia="0.0043604 0.0044044 0.0001118 0 0.0002131 0.0000003"/>
+            <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="left_front_knee_link_mat" type="mesh" mesh="left_front_knee_link"/>
+            <!-- 小腿碰撞几何体 -->
+            <geom pos="0.02 0 -0.134" quat="0.9986295 0 -0.052336 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="cylinder" size="0.0165 0.115"/>
+
+            <!-- 足端 -->
+            <body name="left_front_foot_fixed_link" pos="0 0 -0.275">
+              <inertial pos="-0.0065291 0 -0.009041" mass="0.0999136" fullinertia="0.0000215 0.0000317 0.000025 0 0.0000081 0"/>
+              <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="left_front_foot_fixed_link_mat" type="mesh" mesh="left_front_foot_fixed_link"/>
+              <!-- 足端碰撞球 (摩擦系数 0.6，与 mjlab 参考一致) -->
+              <geom pos="0 0 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="sphere" size="0.03" friction="0.6 0.02 0.01"/>
+              <!-- 足端 Site (用于奖励函数等) -->
+              <site name="left_front_foot_site" size="0.03" group="5" rgba="0 1 0 0.5"/>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <!-- ==================== right_front_foot_site (前右腿) ==================== -->
+      <body name="right_front_hip_roll_link" pos="0.257 -0.088 -0.011">
+        <joint name="right_front_hip_roll" type="hinge" axis="1 0 0" limited="true" range="-1.01 1.01" damping="0" frictionloss="0" armature="0.0318"/>
+        <inertial pos="-0.0027633 0.0224872 0.0000408" mass="1.28105" fullinertia="0.0013247 0.0020035 0.0016402 -0.0000743 -0.0000002 0.0000009"/>
+        <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="right_front_hip_roll_link_mat" type="mesh" mesh="right_front_hip_roll_link"/>
+        <!-- 髋关节碰撞几何体 -->
+        <geom pos="0 0.03 0" quat="0.7071068 0.7071068 0 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="cylinder" size="0.05 0.03"/>
+        <body name="right_front_hip_fixed_link" pos="0 -0.103 0">
+          <geom pos="0 0.0045 0" quat="0.7071068 0.7071068 0 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="cylinder" size="0.06 0.03"/>
+        </body>
+        <body name="right_front_hip_pitch_link" pos="0 -0.103 0">
+          <joint name="right_front_hip_pitch" type="hinge" axis="0 1 0" limited="true" range="-1.74 3.31" damping="0" frictionloss="0" armature="0.0638"/>
+          <inertial pos="-0.0047811 0.0215666 -0.0465094" mass="2.83042" fullinertia="0.0214758 0.0209993 0.0044504 -0.0002864 -0.0017292 -0.0028614"/>
+          <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="right_front_hip_pitch_link_mat" type="mesh" mesh="right_front_hip_pitch_link"/>
+          <!-- 大腿碰撞几何体 -->
+          <geom pos="0.01 0 -0.1575" quat="0.6819984 0 0.7313537 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="box" size="0.1 0.021 0.0325"/>
+          <body name="right_front_knee_link" pos="0 0 -0.275">
+            <joint name="right_front_knee" type="hinge" axis="0 1 0" limited="true" range="-2.77 -1.04" damping="0" frictionloss="0" armature="0.1436"/>
+            <inertial pos="0.0091543 0.0000064 -0.102004" mass="0.365288" fullinertia="0.0043604 0.0044044 0.0001118 0 0.0002131 -0.0000003"/>
+            <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="right_front_knee_link_mat" type="mesh" mesh="right_front_knee_link"/>
+            <geom pos="0.02 0 -0.134" quat="0.9986295 0 -0.052336 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="cylinder" size="0.0165 0.115"/>
+            <body name="right_front_foot_fixed_link" pos="0 0 -0.275">
+              <inertial pos="-0.0065291 0 -0.009041" mass="0.0999136" fullinertia="0.0000215 0.0000317 0.000025 0 0.0000081 0"/>
+              <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="right_front_foot_fixed_link_mat" type="mesh" mesh="right_front_foot_fixed_link"/>
+              <geom pos="0 0 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="sphere" size="0.03" friction="0.6 0.02 0.01"/>
+              <site name="right_front_foot_site" size="0.03" group="5" rgba="0 1 0 0.5"/>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <!-- ==================== left_rear_foot_site (后左腿) ==================== -->
+      <body name="left_rear_hip_roll_link" pos="-0.257 0.088 -0.011">
+        <joint name="left_rear_hip_roll" type="hinge" axis="1 0 0" limited="true" range="-1.01 1.01" damping="0" frictionloss="0" armature="0.0318"/>
+        <inertial pos="0.0027633 -0.0224872 0.0000408" mass="1.28105" fullinertia="0.0013247 0.0020035 0.0016402 -0.0000743 0.0000002 0.0000009"/>
+        <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="left_rear_hip_roll_link_mat" type="mesh" mesh="left_rear_hip_roll_link"/>
+        <!-- 髋关节碰撞几何体 -->
+        <geom pos="0 -0.03 0" quat="0.7071068 0.7071068 0 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="cylinder" size="0.05 0.03"/>
+        <body name="left_rear_hip_fixed_link" pos="0 0.103 0">
+          <geom pos="0 -0.0045 0" quat="0.7071068 0.7071068 0 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="cylinder" size="0.06 0.03"/>
+        </body>
+        <body name="left_rear_hip_pitch_link" pos="0 0.103 0">
+          <joint name="left_rear_hip_pitch" type="hinge" axis="0 1 0" limited="true" range="-1.74 3.31" damping="0" frictionloss="0" armature="0.0638"/>
+          <inertial pos="-0.0047811 -0.0215666 -0.0465094" mass="2.83042" fullinertia="0.0214758 0.0209993 0.0044504 0.0002864 -0.0017292 0.0028614"/>
+          <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="left_rear_hip_pitch_link_mat" type="mesh" mesh="left_rear_hip_pitch_link"/>
+          <!-- 大腿碰撞几何体 -->
+          <geom pos="-0.01 0 -0.1575" quat="0.6819984 0 0.7313537 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="box" size="0.1 0.021 0.0325"/>
+          <body name="left_rear_knee_link" pos="0 0 -0.275">
+            <joint name="left_rear_knee" type="hinge" axis="0 1 0" limited="true" range="-2.77 -1.04" damping="0" frictionloss="0" armature="0.1436"/>
+            <inertial pos="0.0091543 0.0000064 -0.102004" mass="0.365288" fullinertia="0.0043604 0.0044044 0.0001118 0 0.0002131 -0.0000003"/>
+            <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="left_rear_knee_link_mat" type="mesh" mesh="left_rear_knee_link"/>
+            <geom pos="0.02 0 -0.134" quat="0.9986295 0 -0.052336 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="cylinder" size="0.0165 0.115"/>
+            <body name="left_rear_foot_fixed_link" pos="0 0 -0.275">
+              <inertial pos="-0.0065291 0 -0.009041" mass="0.0999136" fullinertia="0.0000215 0.0000317 0.000025 0 0.0000081 0"/>
+              <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="left_rear_foot_fixed_link_mat" type="mesh" mesh="left_rear_foot_fixed_link"/>
+              <geom pos="0 0 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="sphere" size="0.03" friction="0.6 0.02 0.01"/>
+              <site name="left_rear_foot_site" size="0.03" group="5" rgba="0 1 0 0.5"/>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <!-- ==================== right_rear_foot_site (后右腿) ==================== -->
+      <body name="right_rear_hip_roll_link" pos="-0.257 -0.088 -0.011">
+        <joint name="right_rear_hip_roll" type="hinge" axis="1 0 0" limited="true" range="-1.01 1.01" damping="0" frictionloss="0" armature="0.0318"/>
+        <inertial pos="0.0027633 0.0224872 0.0000408" mass="1.28105" fullinertia="0.0013247 0.0020035 0.0016402 0.0000743 0.0000002 -0.0000009"/>
+        <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="right_rear_hip_roll_link_mat" type="mesh" mesh="right_rear_hip_roll_link"/>
+        <!-- 髋关节碰撞几何体 -->
+        <geom pos="0 0.03 0" quat="0.7071068 0.7071068 0 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="cylinder" size="0.05 0.03"/>
+        <body name="right_rear_hip_fixed_link" pos="0 -0.103 0">
+          <geom pos="0 0.0045 0" quat="0.7071068 0.7071068 0 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="cylinder" size="0.06 0.03"/>
+        </body>
+        <body name="right_rear_hip_pitch_link" pos="0 -0.103 0">
+          <joint name="right_rear_hip_pitch" type="hinge" axis="0 1 0" limited="true" range="-1.74 3.31" damping="0" frictionloss="0" armature="0.0638"/>
+          <inertial pos="-0.0047811 0.0215666 -0.0465094" mass="2.83042" fullinertia="0.0214758 0.0209993 0.0044504 -0.0002864 -0.0017292 -0.0028614"/>
+          <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="right_rear_hip_pitch_link_mat" type="mesh" mesh="right_rear_hip_pitch_link"/>
+          <!-- 大腿碰撞几何体 -->
+          <geom pos="0.01 0 -0.1575" quat="0.6819984 0 0.7313537 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="box" size="0.1 0.021 0.0325"/>
+          <body name="right_rear_knee_link" pos="0 0 -0.275">
+            <joint name="right_rear_knee" type="hinge" axis="0 1 0" limited="true" range="-2.77 -1.04" damping="0" frictionloss="0" armature="0.1436"/>
+            <inertial pos="0.0091543 0.0000064 -0.102004" mass="0.365288" fullinertia="0.0043604 0.0044044 0.0001118 0 0.0002131 -0.0000003"/>
+            <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="right_rear_knee_link_mat" type="mesh" mesh="right_rear_knee_link"/>
+            <geom pos="0.02 0 -0.134" quat="0.9986295 0 -0.052336 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="cylinder" size="0.0165 0.115"/>
+            <body name="right_rear_foot_fixed_link" pos="0 0 -0.275">
+              <inertial pos="-0.0065291 0 -0.009041" mass="0.0999136" fullinertia="0.0000215 0.0000317 0.000025 0 0.0000081 0"/>
+              <geom pos="0 0 0" group="1" contype="0" conaffinity="0" material="right_rear_foot_fixed_link_mat" type="mesh" mesh="right_rear_foot_fixed_link"/>
+              <geom pos="0 0 0" rgba="0.9373 0.2667 0.2667 1" group="3" contype="1" conaffinity="1" type="sphere" size="0.03" friction="0.6 0.02 0.01"/>
+              <site name="right_rear_foot_site" size="0.03" group="5" rgba="0 1 0 0.5"/>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+  <actuator>
+    <motor name="left_front_hip_roll_motor" joint="left_front_hip_roll" gear="1" ctrllimited="true" ctrlrange="-90 90"/>
+    <motor name="left_front_hip_pitch_motor" joint="left_front_hip_pitch" gear="1" ctrllimited="true" ctrlrange="-130 130"/>
+    <motor name="left_front_knee_motor" joint="left_front_knee" gear="1" ctrllimited="true" ctrlrange="-195 195"/>
+    <motor name="right_front_hip_roll_motor" joint="right_front_hip_roll" gear="1" ctrllimited="true" ctrlrange="-90 90"/>
+    <motor name="right_front_hip_pitch_motor" joint="right_front_hip_pitch" gear="1" ctrllimited="true" ctrlrange="-130 130"/>
+    <motor name="right_front_knee_motor" joint="right_front_knee" gear="1" ctrllimited="true" ctrlrange="-195 195"/>
+    <motor name="left_rear_hip_roll_motor" joint="left_rear_hip_roll" gear="1" ctrllimited="true" ctrlrange="-90 90"/>
+    <motor name="left_rear_hip_pitch_motor" joint="left_rear_hip_pitch" gear="1" ctrllimited="true" ctrlrange="-130 130"/>
+    <motor name="left_rear_knee_motor" joint="left_rear_knee" gear="1" ctrllimited="true" ctrlrange="-195 195"/>
+    <motor name="right_rear_hip_roll_motor" joint="right_rear_hip_roll" gear="1" ctrllimited="true" ctrlrange="-90 90"/>
+    <motor name="right_rear_hip_pitch_motor" joint="right_rear_hip_pitch" gear="1" ctrllimited="true" ctrlrange="-130 130"/>
+    <motor name="right_rear_knee_motor" joint="right_rear_knee" gear="1" ctrllimited="true" ctrlrange="-195 195"/>
+  </actuator>
+
+  <sensor>
+    <gyro name="base_ang_vel" site="imu" noise="0.005" cutoff="34.9"/>
+    <framequat name="base_rotation" objtype="site" noise="0.001" objname="imu"/>
+    <accelerometer name="base_acc" site="imu" noise="0.005"/>
+  </sensor>
+</mujoco>

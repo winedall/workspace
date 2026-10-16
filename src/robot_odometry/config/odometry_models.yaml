@@ -1,0 +1,23 @@
+# 里程计模型注册表。
+#
+# 与 robot_rl_manager 的 config/humanoid/rl_models.yaml 同构，每项三个键：
+#   config_path  —— 每模型参数（输入布局、维度、频率等）
+#   model_path   —— ONNX 图
+#   adapter_path —— 输入适配器；类名按文件名 PascalCase + "OdometryAdapter"
+#
+# 选择模型：ros2 launch robot_odometry odometry.launch.py model_name:=<name>
+#           ros2 run robot_odometry robot_odometry_node --ros-args -p model_name:=<name>
+#           留空则用下面的 default_model_name。
+default_model_name: "z01_std_odom_with_acc"
+
+models:
+  # 88 维对照：不含基座加速度。
+  z01_std_odom_no_acc:
+    config_path: "config/z01_std_odom_no_acc.yaml"
+    model_path: "model/z01_std_odom_no_acc.onnx"
+    adapter_path: "adapters/z01_std_odom_no_acc.py"
+  # 91 维：含基座加速度（默认）。
+  z01_std_odom_with_acc:
+    config_path: "config/z01_std_odom_with_acc.yaml"
+    model_path: "model/z01_std_odom_with_acc.onnx"
+    adapter_path: "adapters/z01_std_odom_with_acc.py"

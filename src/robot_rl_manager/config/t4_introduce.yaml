@@ -1,0 +1,47 @@
+model:
+  name: t4_introduce
+  control_frequency_hz: 50
+  observation_dim: 144
+  action_dim: 27
+  ankle_in_series: true
+
+joint_profiles:
+  run:
+    joints:
+      # head
+      - {joint_name: head_yaw, position: 0.0, kp: 20.0, kd: 2.0}
+      - {joint_name: head_pitch, position: 0.0, kp: 20.0, kd: 2.0}
+      # left_arm (7)
+      - {joint_name: left_shoulder_pitch, position: 0.153569, kp: 20.0, kd: 1.0}
+      - {joint_name: left_shoulder_roll, position: 0.216868, kp: 20.0, kd: 1.0}
+      - {joint_name: left_shoulder_yaw, position: -0.03033, kp: 20.0, kd: 1.0}
+      - {joint_name: left_elbow, position: -0.38243, kp: 20.0, kd: 1.0}
+      - {joint_name: left_wrist_yaw, position: 0.003242, kp: 20.0, kd: 1.0}
+      - {joint_name: left_wrist_pitch, position: 0.026512, kp: 10.0, kd: 1.0}
+      - {joint_name: left_wrist_roll, position: 0.005913, kp: 10.0, kd: 1.0}
+      # right_arm (7)
+      - {joint_name: right_shoulder_pitch, position: 0.147084, kp: 20.0, kd: 1.0}
+      - {joint_name: right_shoulder_roll, position: -0.22107, kp: 20.0, kd: 1.0}
+      - {joint_name: right_shoulder_yaw, position: 0.039483, kp: 20.0, kd: 1.0}
+      - {joint_name: right_elbow, position: -0.41943, kp: 20.0, kd: 1.0}
+      - {joint_name: right_wrist_yaw, position: -0.00668, kp: 20.0, kd: 1.0}
+      - {joint_name: right_wrist_pitch, position: 0.019646, kp: 10.0, kd: 1.0}
+      - {joint_name: right_wrist_roll, position: -0.005913, kp: 10.0, kd: 1.0}
+      # waist (3)
+      - {joint_name: waist_pitch, position: 0.0, kp: 50.0, kd: 2.0}
+      - {joint_name: waist_roll, position: 0.0, kp: 50.0, kd: 2.0}
+      - {joint_name: waist_yaw, position: 0.0, kp: 50.0, kd: 2.0}
+      # left_leg (6)
+      - {joint_name: left_hip_pitch, position: -0.1112, kp: 100.0, kd: 4.0}
+      - {joint_name: left_hip_roll, position: 0.013328, kp: 50.0, kd: 2.0}
+      - {joint_name: left_hip_yaw, position: 0.014357, kp: 50.0, kd: 2.0}
+      - {joint_name: left_knee, position: 0.190928, kp: 100.0, kd: 4.0}
+      - {joint_name: left_ankle_pitch, position: -0.10064, kp: 40.0, kd: 2}
+      - {joint_name: left_ankle_roll, position: -0.00982, kp: 10.0, kd: 0.5}
+      # right_leg (6)
+      - {joint_name: right_hip_pitch, position: -0.11654, kp: 100.0, kd: 4.0}
+      - {joint_name: right_hip_roll, position: -0.00608, kp: 50.0, kd: 2.0}
+      - {joint_name: right_hip_yaw, position: -0.011202, kp: 50.0, kd: 2.0}
+      - {joint_name: right_knee, position: 0.208095, kp: 100.0, kd: 4.0}
+      - {joint_name: right_ankle_pitch, position: -0.10749, kp: 40.0, kd: 2}
+      - {joint_name: right_ankle_roll, position: -0.00884, kp: 10.0, kd: 0.5}

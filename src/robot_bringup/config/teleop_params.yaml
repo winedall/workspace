@@ -1,0 +1,13 @@
+/**:
+  ros__parameters:
+    source_name: teleop            # 指令源名称，用于意图消息中的 source 字段
+    publish_frequency_hz: 20.0     # 意图发布频率，单位 Hz
+    max_linear_x_mps: 1.0          # 标准速度前后方向线速度，单位 m/s
+    max_linear_y_mps: 0.5          # 标准速度左右方向线速度，单位 m/s
+    max_linear_x_high_mps: 3.0     # 高速模式前后方向线速度，单位 m/s
+    max_linear_y_high_mps: 1.0     # 高速模式左右方向线速度，单位 m/s
+    max_angular_z_radps: 1.5       # 最大偏航角速度，单位 rad/s
+    enable_joy: true               # 是否启动游戏手柄订阅
+    joy_deadzone: 0.08             # 摇杆死区，输入绝对值低于此值视为零
+    dpad_threshold: 0.5            # 十字按键阈值，超过此值视为有效按压
+    joy_timeout_sec: 0.3           # 遥控器信号丢失超时，超过此时间无 Joy 消息则发布零速度指令

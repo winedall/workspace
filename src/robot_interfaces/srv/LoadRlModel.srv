@@ -1,0 +1,17 @@
+# 要加载的模型名称，供后续切换和状态展示使用。
+string model_name
+# 模型文件路径，可为绝对路径或由 rl_manager 解释的相对路径。
+string model_path
+# 模型类型，例如 onnx、torchscript。根据类型自动选择后端（onnx → OnnxPolicyBackend）。
+string model_type
+# 单模型配置文件路径（如 config/heart.yaml），从中读取观测/动作维度和关节增益。
+# 为空时使用保守默认值，但切换前需补充完整 joint_profiles。
+string config_path
+# 策略适配器文件路径，如 policy/adapters/heart.py。
+# 支持绝对路径和相对于 robot_rl_manager 包或当前工作目录的相对路径。
+string adapter_path
+---
+# 是否加载成功。
+bool success
+# 成功或失败的说明。
+string message

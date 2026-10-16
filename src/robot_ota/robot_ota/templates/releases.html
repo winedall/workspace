@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+{% block title %}版本管理{% endblock %}
+{% block heading %}版本管理{% endblock %}
+{% block content %}
+<div class="d-flex justify-between align-center mb-16">
+<div></div>
+<button class="btn btn-primary" onclick="showUploadModal()">+ 上传版本</button>
+</div>
+<div class="card">
+<table><thead><tr><th>版本</th><th>产品</th><th>平台</th><th>文件名</th><th>大小</th><th>状态/进度</th><th>创建时间</th><th>操作</th></tr></thead><tbody id="releasesBody"></tbody></table>
+</div>
+<div class="modal" id="uploadModal">
+<div class="modal-content">
+<h3>上传版本</h3>
+<div class="form-group"><label>发布包（.tar.gz）</label><input type="file" id="upload_archive" accept=".tar.gz,.tar.zst" onchange="parseFileName()"></div>
+<div class="form-group"><label>签名文件（.sig）</label><input type="file" id="upload_signature" accept=".sig" onchange="onSignatureChange()"></div>
+<div class="form-group"><label>版本号</label><input type="text" id="upload_version" readonly style="background:#f5f5f5"></div>
+<div class="form-group"><label>产品名</label><input type="text" id="upload_product" readonly style="background:#f5f5f5"></div>
+<div class="form-group"><label>平台</label><input type="text" id="upload_platform" readonly style="background:#f5f5f5"></div>
+<div class="form-group"><label>发布说明</label><textarea id="upload_notes"></textarea></div>
+<div class="form-actions">
+<button class="btn" onclick="hideUploadModal()">取消</button>
+<button class="btn btn-primary" id="upload_btn" onclick="uploadRelease()">上传</button>
+</div>
+</div>
+</div>
+<script>
+var uploadPollTimer = null;
+var pseudoProgressTimer = null;
+var currentUploadTaskId = null;
+var localUploadTask = null;
+var browserUploadInProgress = false;
+window.addEventListener('beforeunload', function(event) {
+    if (!browserUploadInProgress) return;
+    event.preventDefault();
+    event.returnValue = '';
+});
+function showUploadModal() {
+    document.getElementById('uploadModal').classList.add('show');
+    document.getElementById('upload_archive').value = '';
+    document.getElementById('upload_signature').value = '';
+    document.getElementById('upload_version').value = '';
+    document.getElementById('upload_product').value = '';
+    document.getElementById('upload_platform').value = '';
+    document.getElementById('upload_notes').value = '';
+    document.getElementById('upload_btn').disabled = false;
+}
+function hideUploadModal() { document.getElementById('uploadModal').classList.remove('show'); }
+function loadReleases() {
+    Promise.all([
+        apiFetch('/api/v1/releases/').then(function(r) { return r.json(); }),
+        apiFetch('/api/v1/releases/uploads').then(function(r) {
+            if (!r.ok) return [];
+            return r.json();
+        }).catch(function() { return []; })
+    ]).then(function(results) {
+        renderReleaseTable(results[0] || [], results[1] || []);
+    }).catch(function() {
+        var tbody = document.getElementById('releasesBody');
+        tbody.innerHTML = '<tr><td colspan="99" style="text-align:center;padding:20px;color:#cf1322;">数据加载失败</td></tr>';
+    });
+}
+function parseFileName() {
+    var file = document.getElementById('upload_archive').files[0];
+    if (!file) return;
+    var name = file.name;
+    var match = name.match(/^(.+)-([0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.]+)?)-(linux-[A-Za-z0-9_]+)\.tar\.(gz|zst)$/);
+    if (match) {
+        document.getElementById('upload_product').value = match[1];
+        document.getElementById('upload_version').value = match[2];
+        document.getElementById('upload_platform').value = match[3];
+        checkSignatureMatch();
+    } else {
+        alert('文件名格式不正确，应为：{product}-{version}-{platform}.tar.gz');
+        document.getElementById('upload_archive').value = '';
+    }
+}
+function checkSignatureMatch() {
+    var archiveFile = document.getElementById('upload_archive').files[0];
+    var signatureFile = document.getElementById('upload_signature').files[0];
+    if (!archiveFile || !signatureFile) return;
+    var expectedSigName = archiveFile.name + '.sig';
+    if (signatureFile.name !== expectedSigName) {
+        alert('签名文件名不匹配，应为：' + expectedSigName);
+        document.getElementById('upload_signature').value = '';
+    }
+}
+function onSignatureChange() {
+    var archiveFile = document.getElementById('upload_archive').files[0];
+    var signatureFile = document.getElementById('upload_signature').files[0];
+    if (!archiveFile || !signatureFile) return;
+    var expectedSigName = archiveFile.name + '.sig';
+    if (signatureFile.name !== expectedSigName) {
+        alert('签名文件名不匹配，应为：' + expectedSigName);
+        document.getElementById('upload_signature').value = '';
+    }
+}
+function renderRow(tr, r) {
+    tr.innerHTML = '<td><strong>' + escapeHtml(r.version) + '</strong></td>' +
+        '<td>' + escapeHtml(r.product) + '</td>' +
+        '<td>' + escapeHtml(r.platform) + '</td>' +
+        '<td>' + escapeHtml(releaseFileName(r)) + '</td>' +
+        '<td>' + formatSize(r.file_size) + '</td>' +
+        '<td><span style="color:#2e7d32;">已发布</span></td>' +
+        '<td>' + localTime(r.created_at) + '</td>' +
+        '<td><button class="btn btn-danger btn-sm" onclick="deleteRelease(' + r.id + ')">删除</button></td>';
+}
+function releaseFileName(r) {
+    if (!r.archive_path) return '-';
+    return String(r.archive_path).split('/').pop() || '-';
+}
+function formatSize(size) {
+    if (!size || size <= 0) return '-';
+    return size > 1048576 ? (size / 1048576).toFixed(1) + ' MB' : size > 1024 ? (size / 1024).toFixed(1) + ' KB' : size + ' B';
+}
+function renderReleaseTable(releases, uploadTasks) {
+    var tbody = document.getElementById('releasesBody');
+    var tasks = uploadTasks.filter(function(task) {
+        return task.status !== 'succeeded';
+    });
+    if (localUploadTask && !tasks.some(function(t) { return t.task_id === localUploadTask.task_id; })) {
+        tasks.unshift(localUploadTask);
+    }
+    if (tasks.length === 0 && releases.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="99" class="empty-state"><p>暂无数据</p></td></tr>';
+        return;
+    }
+    tbody.innerHTML = '';
+    tasks.forEach(function(task) {
+        var tr = document.createElement('tr');
+        tr.setAttribute('data-upload-task-id', task.task_id);
+        tbody.appendChild(tr);
+        renderUploadRow(tr, task);
+    });
+    releases.forEach(function(row) {
+        var tr = document.createElement('tr');
+        tbody.appendChild(tr);
+        renderRow(tr, row);
+    });
+}
+function renderUploadRow(tr, task) {
+    var statusText = {
+        'pending': '准备中',
+        'uploading': '上传中',
+        'processing': '处理中',
+        'succeeded': '完成',
+        'failed': '失败'
+    };
+    var progress = task.progress == null ? 0 : task.progress;
+    var failed = task.status === 'failed';
+    var color = failed ? '#cf1322' : '#2e7d32';
+    var detail = failed ? ('上传失败: ' + escapeHtml(task.error || '未知错误')) : (statusText[task.status] || task.status);
+    tr.innerHTML = '<td><strong>' + escapeHtml(task.version || '-') + '</strong></td>' +
+        '<td>' + escapeHtml(task.product || '-') + '</td>' +
+        '<td>' + escapeHtml(task.platform || '-') + '</td>' +
+        '<td>' + escapeHtml(task.filename || '-') + '</td>' +
+        '<td>' + formatSize(task.file_size) + '</td>' +
+        '<td>' +
+        '<div style="display:flex;align-items:center;gap:10px;min-width:180px;">' +
+        '<span style="width:64px;color:' + color + ';">' + detail + '</span>' +
+        '<div style="flex:1;background:#f0f0f0;border-radius:4px;height:8px;min-width:100px;">' +
+        '<div style="width:' + progress + '%;height:100%;background:' + color + ';border-radius:4px;transition:width 0.3s;"></div>' +
+        '</div>' +
+        '<span>' + progress + '%</span>' +
+        '</div>' +
+        '</td>' +
+        '<td>' + localTime(task.created_at) + '</td>' +
+        '<td>-</td>';
+}
+function uploadRelease() {
+    var archiveFile = document.getElementById('upload_archive').files[0];
+    var signatureFile = document.getElementById('upload_signature').files[0];
+    var version = document.getElementById('upload_version').value;
+    var product = document.getElementById('upload_product').value;
+    var platform = document.getElementById('upload_platform').value;
+    var notes = document.getElementById('upload_notes').value.trim();
+    if (!archiveFile) { alert('请选择发布包'); return; }
+    if (!signatureFile) { alert('请选择签名文件'); return; }
+    if (!version) { alert('版本号解析失败，请检查文件名格式'); return; }
+    var expectedSigName = archiveFile.name + '.sig';
+    if (signatureFile.name !== expectedSigName) {
+        alert('签名文件名不匹配，应为：' + expectedSigName);
+        return;
+    }
+    document.getElementById('upload_btn').disabled = true;
+    hideUploadModal();
+    showUploadProgress({
+        task_id: 'local-upload',
+        status: 'created',
+        progress: 1,
+        filename: archiveFile.name,
+        version: version,
+        product: product,
+        platform: platform,
+        error: '',
+        created_at: ''
+    });
+
+    var form = new FormData();
+    form.append('version', version);
+    form.append('product', product);
+    form.append('platform', platform);
+    form.append('release_notes', notes);
+    form.append('archive', archiveFile);
+    form.append('signature', signatureFile);
+    startPseudoUploadProgress();
+    uploadReleaseRequest(form).then(function(data) {
+        stopPseudoUploadProgress();
+        var previousTaskId = localUploadTask.task_id;
+        currentUploadTaskId = data.task_id;
+        localUploadTask.task_id = data.task_id;
+        localUploadTask.status = data.status || 'pending';
+        localUploadTask.progress = Math.max(localUploadTask.progress || 0, 60);
+        var previousRow = document.querySelector('tr[data-upload-task-id="' + previousTaskId + '"]');
+        if (previousRow) previousRow.setAttribute('data-upload-task-id', data.task_id);
+        upsertUploadTask(localUploadTask);
+        pollUploadStatus(data.task_id);
+        uploadPollTimer = setInterval(function() { pollUploadStatus(data.task_id); }, 1000);
+    }).catch(function(error) {
+        stopPseudoUploadProgress();
+        browserUploadInProgress = false;
+        handleUploadError(error);
+    });
+}
+function uploadReleaseRequest(form) {
+    browserUploadInProgress = true;
+    return apiFetch('/api/v1/releases/upload', {
+        method: 'POST',
+        body: form
+    }).then(function(r) {
+        browserUploadInProgress = false;
+        if (!r.ok) {
+            return r.json().then(function(err) { throw new Error(err.detail || '上传失败'); });
+        }
+        return r.json();
+    });
+}
+function startPseudoUploadProgress() {
+    stopPseudoUploadProgress();
+    if (!localUploadTask) return;
+    pseudoProgressTimer = setInterval(function() {
+        if (!localUploadTask) return;
+        localUploadTask.status = 'uploading';
+        var current = localUploadTask.progress || 1;
+        if (current < 60) {
+            localUploadTask.progress = Math.min(60, current + 1);
+            upsertUploadTask(localUploadTask);
+        }
+    }, 500);
+}
+function stopPseudoUploadProgress() {
+    if (pseudoProgressTimer) {
+        clearInterval(pseudoProgressTimer);
+        pseudoProgressTimer = null;
+    }
+}
+function updateLocalUploadProgress(status, progress) {
+    if (!localUploadTask) return;
+    localUploadTask.status = status;
+    localUploadTask.progress = Math.max(localUploadTask.progress || 0, progress);
+    upsertUploadTask(localUploadTask);
+}
+function handleUploadError(error) {
+    if (uploadPollTimer) {
+        clearInterval(uploadPollTimer);
+        uploadPollTimer = null;
+    }
+    stopPseudoUploadProgress();
+    updateUploadProgress('上传失败: ' + error.message, 0, true);
+    document.getElementById('upload_btn').disabled = false;
+}
+function updateUploadProgress(statusText, progress, failed) {
+    if (!localUploadTask) return;
+    localUploadTask.status = failed ? 'failed' : localUploadTask.status;
+    localUploadTask.progress = progress;
+    if (failed) localUploadTask.error = statusText.replace(/^上传失败:\s*/, '');
+    upsertUploadTask(localUploadTask);
+}
+function showUploadProgress(task) {
+    if (uploadPollTimer) {
+        clearInterval(uploadPollTimer);
+        uploadPollTimer = null;
+    }
+    localUploadTask = task;
+    currentUploadTaskId = task.task_id;
+    upsertUploadTask(task);
+}
+function upsertUploadTask(task) {
+    var tbody = document.getElementById('releasesBody');
+    var emptyRow = tbody.querySelector('.empty-state');
+    if (emptyRow && emptyRow.parentNode) emptyRow.parentNode.remove();
+    var selector = 'tr[data-upload-task-id="' + task.task_id + '"]';
+    var tr = tbody.querySelector(selector);
+    if (!tr) {
+        tr = document.createElement('tr');
+        tr.setAttribute('data-upload-task-id', task.task_id);
+        tbody.insertBefore(tr, tbody.firstChild);
+    }
+    renderUploadRow(tr, task);
+}
+function pollUploadStatus(taskId) {
+    if (!taskId) return;
+    apiFetch('/api/v1/releases/uploads/' + taskId).then(function(r) {
+        if (!r.ok) throw new Error('获取上传状态失败');
+        return r.json();
+    }).then(function(task) {
+        if (localUploadTask && localUploadTask.task_id === task.task_id) {
+            task.progress = Math.max(task.progress || 0, localUploadTask.progress || 0);
+        }
+        localUploadTask = task;
+        upsertUploadTask(task);
+        if (task.status === 'succeeded' || task.status === 'failed') {
+            if (uploadPollTimer) {
+                clearInterval(uploadPollTimer);
+                uploadPollTimer = null;
+            }
+            stopPseudoUploadProgress();
+            localUploadTask = null;
+            loadReleases();
+        }
+    }).catch(function(e) {
+        console.error('Poll upload status error:', e);
+    });
+}
+function deleteRelease(id) {
+    if (!confirm('确定删除版本 #' + id + ' 吗？')) return;
+    apiFetch('/api/v1/releases/' + id, { method: 'DELETE' }).then(function(r) {
+        if (r.status === 204) { loadReleases(); }
+        else { throw new Error('删除失败'); }
+    }).catch(function(e) { alert('删除版本失败: ' + e.message); });
+}
+function recoverActiveUploads() {
+    apiFetch('/api/v1/releases/uploads').then(function(r) {
+        if (!r.ok) return;
+        return r.json();
+    }).then(function(tasks) {
+        if (tasks && tasks.length > 0) {
+            var task = tasks[0];
+            currentUploadTaskId = task.task_id;
+            showUploadProgress(task);
+            pollUploadStatus(task.task_id);
+            uploadPollTimer = setInterval(function() { pollUploadStatus(task.task_id); }, 1000);
+        }
+    }).catch(function() {});
+}
+loadReleases();
+recoverActiveUploads();
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+robot_odometry_node:
+  ros__parameters:
+    # 模型注册表路径。留空则使用包内 config/odometry_models.yaml。
+    models_config: ""
+
+    # 使用的模型名，必须在注册表 models 段中。留空则取注册表的
+    # default_model_name。可选：z01_std_odom_no_acc / z01_std_odom_with_acc。
+    model_name: ""
+
+    # onnxruntime 线程数。单帧推理在 20ms 预算内非常宽裕，保持单线程即可。
+    onnx_intra_op_num_threads: 1
+    onnx_inter_op_num_threads: 1
+
+    # 输入话题。推理节奏由本节点自己的定时器驱动（频率来自模型配置），
+    # 因此这两个话题只提供数据，谁在什么频率上发布都不影响推理节奏。
+    joint_states_topic: "control/hardware_states"
+    imu_topic: "imu/nav_all"
+    # 行走门控：只有 RobotState == RL_ACTIVE 时才做估计，其它状态输出 0。
+    state_topic: "state"
+
+    # 输出话题。
+    odom_topic: "odometry/odom"
+    delta_topic: "odometry/delta"
+    reset_topic: "odometry/reset"
+
+    # 坐标系命名。本仓库没有 TF 树，这两个名字仅用于标注消息来源。
+    odom_frame_id: "odom"
+    base_frame_id: "base_link"
+
+    # 关节状态 / IMU 新鲜度阈值，超时则跳过本帧推理。
+    # 上游 hardware_states 为 200Hz，nav_all 为高频，0.1s 已相当宽松。
+    input_timeout_sec: 0.1
+
+    # 控制流中断阈值：两次推理间隔超过该时长，说明策略已停止或重启，
+    # 历史窗口不再连续，需要重置模型状态。
+    reset_gap_sec: 0.1
+
+    # 非行走状态下维持零值输出的频率。
+    idle_publish_rate_hz: 10.0
+
+    # 单步位移合理性上限（米）。模型在越界输入下自回归会放大，
+    # 超过该阈值视为发散：丢弃本步、重置模型并重新从复制窗口起步。
+    # 0.2m/步 @50Hz 折合 10m/s，对行走已非常宽松，不会误伤正常步态。
+    max_step_delta_m: 0.2
+
+    # 逐帧记录「真值 vs 估计」对比表。
+    # 输出目录优先级：csv_dir → $ZL_ROBOT_RECORDER_DIR/odometry → ./logs/odometry。
+    csv_enabled: true
+    csv_dir: ""

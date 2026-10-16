@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CycloneDDS xmlns="https://cdds.io/config"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="https://cdds.io/config https://raw.githubusercontent.com/eclipse-cyclonedds/cyclonedds/master/etc/cyclonedds.xsd">
+  <!--
+    Internal robot control domain.
+    Keep all high-frequency control nodes on the local loopback interface so
+    external debug/navigation network changes cannot affect internal DDS traffic.
+  -->
+  <Domain Id="10">
+    <General>
+      <Interfaces>
+        <NetworkInterface name="lo" multicast="false"/>
+      </Interfaces>
+      <AllowMulticast>false</AllowMulticast>
+      <MulticastRecvNetworkInterfaceAddresses>none</MulticastRecvNetworkInterfaceAddresses>
+    </General>
+    <Discovery>
+      <ParticipantIndex>auto</ParticipantIndex>
+      <MaxAutoParticipantIndex>100</MaxAutoParticipantIndex>
+    </Discovery>
+  </Domain>
+
+  <!--
+    External navigation/debug domain.
+    Only the domain_bridge process should use this domain to expose whitelisted
+    ROS interfaces over the wired debug port. Do not bind DDS to the EtherCAT NIC.
+  -->
+  <Domain Id="100">
+    <General>
+      <Interfaces>
+        <NetworkInterface address="10.1.2.3" multicast="true"/>
+      </Interfaces>
+      <AllowMulticast>spdp</AllowMulticast>
+      <MulticastRecvNetworkInterfaceAddresses>preferred</MulticastRecvNetworkInterfaceAddresses>
+    </General>
+    <Discovery>
+      <ParticipantIndex>auto</ParticipantIndex>
+      <MaxAutoParticipantIndex>100</MaxAutoParticipantIndex>
+    </Discovery>
+  </Domain>
+</CycloneDDS>

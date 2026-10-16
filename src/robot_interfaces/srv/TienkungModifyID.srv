@@ -1,0 +1,12 @@
+# Tienkung 配置命令：把指定关节的电机 ID 修改为 new_motor_id。
+# timeout_sec <= 0 时由 robot_driver 使用默认超时时间。
+string joint_name
+uint8 new_motor_id
+float32 timeout_sec
+---
+# motor_id 为反馈中解析到的电机 ID；new_motor_id 回传本次请求的新 ID。
+bool success
+string message
+uint16 motor_id
+uint8 new_motor_id
+uint8 feedback_code

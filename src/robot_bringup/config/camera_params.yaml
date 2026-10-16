@@ -1,0 +1,20 @@
+/**:
+  ros__parameters:
+    # 4.1 基础配置 - 仅深度图，用于强化学习模型环境观测
+    serial_no: ""
+    enable_color: false
+    enable_depth: true
+    enable_infra: false
+    enable_gyro: false
+    enable_accel: false
+    rgb_camera.color_profile: "640,480,30"   # 宽,高,帧率
+    rgb_camera.color_format: "RGB8"         # 常用：RGB8 / BGR8 / YUYV / MJPG
+    depth_module.depth_profile: "640,360,30"
+    depth_module.depth_format: "Z16"
+    pointcloud.enable: false
+    align_depth.enable: false
+    clip_distance: 3.0
+    enable_sync: false
+    publish_tf: false
+    color_qos: "SENSOR_DATA"   # 新增：color 图 → best_effort
+    depth_qos: "SENSOR_DATA"   # 新增：depth 图 → best_effort

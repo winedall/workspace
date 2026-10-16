@@ -1,0 +1,47 @@
+model:
+  name: t4_long_jump_l              # 模型名称，与 rl_models.yaml 中的 key 对应
+  control_frequency_hz: 50          # 策略控制频率，单位 Hz
+  observation_dim: 324              # 观测向量维度，用于验证适配器输出
+  action_dim: 27                    # 动作向量维度，用于验证策略推理输出
+  ankle_in_series: false            # 当前模型是否输出串联踝关节（true=串联模型，false=并联模型，robot_control 据此做踝关节空间转换）
+
+joint_profiles:
+  run:
+    joints:
+      # head
+      - {joint_name: head_yaw, position: 0.0, kp: 20.0, kd: 1.0}
+      - {joint_name: head_pitch, position: 0.0, kp: 20.0, kd: 1.0}
+      # left_arm (7)
+      - {joint_name: left_shoulder_pitch, position: 0.35, kp: 20.0, kd: 1.0}
+      - {joint_name: left_shoulder_roll, position: 0.18, kp: 20.0, kd: 1.0}
+      - {joint_name: left_shoulder_yaw, position: 0.0, kp: 20.0, kd: 1.0}
+      - {joint_name: left_elbow, position: -0.7, kp: 20.0, kd: 1.0}
+      - {joint_name: left_wrist_yaw, position: 0.0, kp: 20.0, kd: 1.0}
+      - {joint_name: left_wrist_pitch, position: 0.0, kp: 10.0, kd: 1.0}
+      - {joint_name: left_wrist_roll, position: 0.0, kp: 10.0, kd: 1.0}
+      # right_arm (7)
+      - {joint_name: right_shoulder_pitch, position: 0.35, kp: 20.0, kd: 1.0}
+      - {joint_name: right_shoulder_roll, position: -0.18, kp: 20.0, kd: 1.0}
+      - {joint_name: right_shoulder_yaw, position: 0.0, kp: 20.0, kd: 1.0}
+      - {joint_name: right_elbow, position: -0.7, kp: 20.0, kd: 1.0}
+      - {joint_name: right_wrist_yaw, position: 0.0, kp: 20.0, kd: 1.0}
+      - {joint_name: right_wrist_pitch, position: 0.0, kp: 10.0, kd: 1.0}
+      - {joint_name: right_wrist_roll, position: 0.0, kp: 10.0, kd: 1.0}
+      # waist (3) — 高增益同源配置 T4_long_jump.yaml
+      - {joint_name: waist_pitch, position: 0.0, kp: 20000.0, kd: 5000.0}
+      - {joint_name: waist_roll, position: 0.0, kp: 20000.0, kd: 5000.0}
+      - {joint_name: waist_yaw, position: 0.0, kp: 50.0, kd: 2.0}
+      # left_leg (6)
+      - {joint_name: left_hip_pitch, position: -0.1, kp: 100.0, kd: 4.0}
+      - {joint_name: left_hip_roll, position: 0.0, kp: 50.0, kd: 2.0}
+      - {joint_name: left_hip_yaw, position: 0.0, kp: 50.0, kd: 2.0}
+      - {joint_name: left_knee, position: 0.3, kp: 100.0, kd: 4.0}
+      - {joint_name: left_ankle_pitch, position: 0.238, kp: 20.0, kd: 1.0}
+      - {joint_name: left_ankle_roll, position: -0.238, kp: 20.0, kd: 1.0}
+      # right_leg (6)
+      - {joint_name: right_hip_pitch, position: -0.1, kp: 100.0, kd: 4.0}
+      - {joint_name: right_hip_roll, position: 0.0, kp: 50.0, kd: 2.0}
+      - {joint_name: right_hip_yaw, position: 0.0, kp: 50.0, kd: 2.0}
+      - {joint_name: right_knee, position: 0.3, kp: 100.0, kd: 4.0}
+      - {joint_name: right_ankle_pitch, position: -0.238, kp: 20.0, kd: 1.0}
+      - {joint_name: right_ankle_roll, position: 0.238, kp: 20.0, kd: 1.0}

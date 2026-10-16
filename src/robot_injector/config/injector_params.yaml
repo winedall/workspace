@@ -1,0 +1,16 @@
+fault_injector_node:
+  ros__parameters:
+    # 注入模式：system_fault / joint_warning / both
+    mode: ""
+
+    # both 模式下的发布顺序：warning_first / fault_first
+    order: warning_first
+
+    # joint_warning 使用的关节名和底层 motor_error
+    joint_name: waist_yaw
+    motor_error: 2
+
+    # 发布控制；count <= 0 表示持续发布
+    delay_sec: 0.0
+    period_ms: 100.0
+    count: 3

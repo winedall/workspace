@@ -1,0 +1,746 @@
+# 人形机器人强化学习模型注册表。
+# model_switch_rules 定义模型切换规则。
+#   pairs: 双向配对的模型列表，如 squat_down↔squat_up
+#   sequences: 命名动作序列，按 motion_end 串联多个模型
+model_switch_rules:
+  pairs:
+    - ["t4_squat_down", "t4_squat_up"]
+    - ["t4_sit_down", "t4_sit_up"]
+  sequences:
+    kd_crawl:
+      models:
+        - "t4_walk"
+      return_home: false
+
+models:
+  # ================ 行走类模型 ================
+  z01_std_walk:
+    alias: "行走"
+    category: "走跑类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/z01_std_walk.yaml"
+    adapter_path: "policy/adapters/z01_std_walk.py"
+    artifacts:
+      x86_64:
+        model_path: "model/z01_std_walk.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/z01_std_walk.onnx"
+        backend: onnx
+  z01_pa_walk:
+    alias: "行走"
+    category: "走跑类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/z01_pa_walk.yaml"
+    adapter_path: "policy/adapters/z01_pa_walk.py"
+    artifacts:
+      x86_64:
+        model_path: "model/z01_pa_walk.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/z01_pa_walk.onnx"
+        backend: onnx
+  t4_walk:
+    alias: "行走"
+    category: "走跑类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_walk.yaml"
+    adapter_path: "policy/adapters/t4_walk.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_walk.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_walk.rknn"
+        backend: rknn
+  t4_sprint:
+    alias: "快走"
+    category: "走跑类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_sprint.yaml"
+    adapter_path: "policy/adapters/t4_sprint.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_sprint_02.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_sprint_02.rknn"
+        backend: rknn
+  t4_depth:
+    alias: "视觉行走"
+    category: "走跑类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_depth.yaml"
+    adapter_path: "policy/adapters/t4_depth.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_depth.onnx"
+        backend: onnx
+  # ================ 动作类模型 ================
+  t4_heart:
+    alias: "比心"
+    category: "单次动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_heart.yaml"
+    adapter_path: "policy/adapters/t4_heart.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_heart.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_heart.rknn"
+        backend: rknn
+  t4_salute:
+    alias: "敬礼"
+    category: "单次动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_salute.yaml"
+    adapter_path: "policy/adapters/t4_salute.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_salute.pt"
+        backend: pt
+  t4_hello:
+    alias: "挥手"
+    category: "单次动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_hello.yaml"
+    adapter_path: "policy/adapters/t4_hello.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_hello.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_hello.rknn"
+        backend: rknn
+  t4_introduce:
+    alias: "自我介绍"
+    category: "单次动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_introduce.yaml"
+    adapter_path: "policy/adapters/t4_introduce.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_introduce.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_introduce.onnx"
+        backend: onnx
+  t4_introduce_left:
+    alias: "自我介绍（左）"
+    category: "单次动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_introduce_left.yaml"
+    adapter_path: "policy/adapters/t4_introduce_left.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_introduce_left.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_introduce_left.onnx"
+        backend: onnx
+  t4_introduce_right:
+    alias: "自我介绍（右）"
+    category: "单次动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_introduce_right.yaml"
+    adapter_path: "policy/adapters/t4_introduce_right.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_introduce_right.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_introduce_right.onnx"
+        backend: onnx
+  t4_high_five:
+    alias: "击掌"
+    category: "单次动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_high_five.yaml"
+    adapter_path: "policy/adapters/t4_high_five.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_high_five.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_high_five.rknn"
+        backend: rknn
+  t4_zl1:
+    alias: "展览1"
+    category: "单次动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_zl1.yaml"
+    adapter_path: "policy/adapters/t4_zl1.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_zl1.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_zl1.rknn"
+        backend: rknn
+  t4_zl2:
+    alias: "展览2"
+    category: "单次动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_zl2.yaml"
+    adapter_path: "policy/adapters/t4_zl2.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_zl2.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_zl2.rknn"
+        backend: rknn
+  t4_zl3:
+    alias: "展览3"
+    category: "单次动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_zl3.yaml"
+    adapter_path: "policy/adapters/t4_zl3.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_zl3.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_zl3.rknn"
+        backend: rknn
+  t4_zl4:
+    alias: "展览4"
+    category: "单次动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_zl4.yaml"
+    adapter_path: "policy/adapters/t4_zl4.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_zl4.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_zl4.rknn"
+        backend: rknn
+  t4_zl5:
+    alias: "展览5"
+    category: "单次动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_zl5.yaml"
+    adapter_path: "policy/adapters/t4_zl5.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_zl5.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_zl5.rknn"
+        backend: rknn
+  t4_zl6:
+    alias: "展览6"
+    category: "单次动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_zl6.yaml"
+    adapter_path: "policy/adapters/t4_zl6.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_zl6.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_zl6.rknn"
+        backend: rknn
+  # ================ 动作类（持续）模型 ================
+  t4_standby:
+    alias: "待机"
+    category: "持续动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_standby.yaml"
+    adapter_path: "policy/adapters/t4_standby.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_standby.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_standby.rknn"
+        backend: rknn
+  t4_clap:
+    alias: "鼓掌"
+    category: "持续动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_clap.yaml"
+    adapter_path: "policy/adapters/t4_clap.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_clap.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_clap.onnx"
+        backend: onnx
+  t4_handshake:
+    alias: "握手"
+    category: "持续动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_handshake.yaml"
+    adapter_path: "policy/adapters/t4_handshake.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_handshake.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_handshake.rknn"
+        backend: rknn
+  t4_rhello:
+    alias: "右手挥手"
+    category: "持续动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_rhello.yaml"
+    adapter_path: "policy/adapters/t4_rhello.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_rhello.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_rhello.rknn"
+        backend: rknn
+  t4_rintroduce_left:
+    alias: "自我介绍（左）（持续）"
+    category: "持续动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_rintroduce_left.yaml"
+    adapter_path: "policy/adapters/t4_rintroduce_left.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_introduce_left.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_introduce_left.onnx"
+        backend: onnx
+  t4_rintroduce_right:
+    alias: "自我介绍（右）（持续）"
+    category: "持续动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_rintroduce_right.yaml"
+    adapter_path: "policy/adapters/t4_rintroduce_right.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_introduce_right.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_introduce_right.onnx"
+        backend: onnx
+  t4_yb1:
+    alias: "迎宾1"
+    category: "持续动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_yb1.yaml"
+    adapter_path: "policy/adapters/t4_yb1.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_yb1.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_yb1.rknn"
+        backend: rknn
+  t4_yb2:
+    alias: "迎宾2"
+    category: "持续动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_yb2.yaml"
+    adapter_path: "policy/adapters/t4_yb2.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_yb2.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_yb2.rknn"
+        backend: rknn
+  t4_yb2_left:
+    alias: "左迎宾2"
+    category: "持续动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_yb2_left.yaml"
+    adapter_path: "policy/adapters/t4_yb2_left.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_yb2_left.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_yb2_left.rknn"
+        backend: rknn
+  t4_yb3:
+    alias: "迎宾3"
+    category: "持续动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_yb3.yaml"
+    adapter_path: "policy/adapters/t4_yb3.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_yb3.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_yb3.rknn"
+        backend: rknn
+  t4_yb3_left:
+    alias: "左迎宾3"
+    category: "持续动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_yb3_left.yaml"
+    adapter_path: "policy/adapters/t4_yb3_left.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_yb3_left.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_yb3_left.rknn"
+        backend: rknn
+  t4_yb4:
+    alias: "迎宾4"
+    category: "持续动作类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_yb4.yaml"
+    adapter_path: "policy/adapters/t4_yb4.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_yb4.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_yb4.rknn"
+        backend: rknn
+  # ================ 特技类模型 ================
+  z01_front_flip:
+    alias: "前空翻"
+    category: "特技类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/z01_front_flip.yaml"
+    adapter_path: "policy/adapters/z01_front_flip.py"
+    artifacts:
+      x86_64:
+        model_path: "model/z01_front_flip.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/z01_front_flip.onnx"
+        backend: onnx
+  z01_pa_front_flip:
+    alias: "前空翻"
+    category: "特技类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/z01_pa_front_flip.yaml"
+    adapter_path: "policy/adapters/z01_pa_front_flip.py"
+    artifacts:
+      x86_64:
+        model_path: "model/z01_pa_front_flip.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/z01_pa_front_flip.onnx"
+        backend: onnx
+  z01_side_flip:
+    alias: "侧空翻"
+    category: "特技类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/z01_side_flip.yaml"
+    adapter_path: "policy/adapters/z01_side_flip.py"
+    artifacts:
+      x86_64:
+        model_path: "model/z01_side_flip.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/z01_side_flip.onnx"
+        backend: onnx
+  z01_jd_jump:
+    alias: "跳高"
+    category: "特技类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/z01_jd_jump.yaml"
+    adapter_path: "policy/adapters/z01_jd_jump.py"
+    artifacts:
+      x86_64:
+        model_path: "model/z01_jd_jump.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/z01_jd_jump.onnx"
+        backend: onnx
+  t4_long_jump_l:
+    alias: "跳远"
+    category: "特技类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_long_jump_l.yaml"
+    adapter_path: "policy/adapters/t4_long_jump_l.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_long_jump_l.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_long_jump_l.rknn"
+        backend: rknn
+  t4_side_flip:
+    alias: "侧空翻"
+    category: "特技类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_side_flip.yaml"
+    adapter_path: "policy/adapters/t4_side_flip.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_side_flip.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_side_flip.rknn"
+        backend: rknn
+  t4_front_flip:
+    alias: "前空翻"
+    category: "特技类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_front_flip.yaml"
+    adapter_path: "policy/adapters/t4_front_flip.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_front_flip.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_front_flip.rknn"
+        backend: rknn
+  t4_high_jump_02:
+    alias: "跳高2"
+    category: "特技类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_high_jump_02.yaml"
+    adapter_path: "policy/adapters/t4_high_jump_02.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_high_jump_02.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_high_jump_02.rknn"
+        backend: rknn
+  t4_high_jump_03:
+    alias: "跳高3"
+    category: "特技类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_high_jump_02.yaml"
+    adapter_path: "policy/adapters/t4_high_jump_02.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_high_jump_02.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_high_jump_02.rknn"
+        backend: rknn
+  t4_jd_jump:
+    alias: "原地跳"
+    category: "特技类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_jd_jump.yaml"
+    adapter_path: "policy/adapters/t4_jd_jump.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_jd_jump.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_jd_jump.rknn"
+        backend: rknn
+  # ================ 舞蹈类模型 ================
+  t4_taichi:
+    alias: "动太极"
+    category: "跳舞类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_taichi.yaml"
+    adapter_path: "policy/adapters/t4_taichi.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_taichi.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_taichi.rknn"
+        backend: rknn
+  t4_taichi_w:
+    alias: "静太极"
+    category: "跳舞类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_taichi_w.yaml"
+    adapter_path: "policy/adapters/t4_taichi_w.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_taichi_w.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_taichi_w.rknn"
+        backend: rknn
+  t4_mj_dance:
+    alias: "滑步舞"
+    category: "跳舞类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_mj_dance.yaml"
+    adapter_path: "policy/adapters/t4_mj_dance.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_mj_dance.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_mj_dance.rknn"
+        backend: rknn
+  t4_xqxa123_dance:
+    alias: "相亲相爱舞"
+    category: "跳舞类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_xqxa123_dance.yaml"
+    adapter_path: "policy/adapters/t4_xqxa123_dance.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_xqxa123_dance.onnx"
+        backend: onnx
+  t4_apt:
+    alias: "APT舞"
+    category: "跳舞类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_apt.yaml"
+    adapter_path: "policy/adapters/t4_apt.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_apt.onnx"
+        backend: onnx
+  t4_rhythm:
+    alias: "节奏舞"
+    category: "跳舞类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_rhythm.yaml"
+    adapter_path: "policy/adapters/t4_rhythm.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_rhythm.onnx"
+        backend: onnx
+  # ================ 足球类模型 ================
+  t4_kick:
+    alias: "踢球"
+    category: "足球类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_kick.yaml"
+    adapter_path: "policy/adapters/t4_kick.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_kick.onnx"
+        backend: onnx
+  # ================ 起身类模型 ================
+  t4_squat_down:
+    alias: "蹲下"
+    category: "起身类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_squat_down.yaml"
+    adapter_path: "policy/adapters/t4_squat_down.py"
+    artifacts:
+      x86_64:
+        model_path: ""
+        backend: pipeline
+      aarch64:
+        model_path: ""
+        backend: pipeline
+  t4_squat_up:
+    alias: "蹲起"
+    category: "起身类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_squat_up.yaml"
+    adapter_path: "policy/adapters/t4_squat_up.py"
+    artifacts:
+      x86_64:
+        model_path: ""
+        backend: pipeline
+      aarch64:
+        model_path: ""
+        backend: pipeline
+  t4_raise_down:
+    alias: "坐下"
+    category: "起身类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_raise_down.yaml"
+    adapter_path: "policy/adapters/t4_raise_down.py"
+    artifacts:
+      x86_64:
+        model_path: ""
+        backend: pipeline
+      aarch64:
+        model_path: ""
+        backend: pipeline
+  t4_raise_up:
+    alias: "坐起"
+    category: "起身类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_raise_up.yaml"
+    adapter_path: "policy/adapters/t4_raise_up.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_raise_up.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_raise_up.rknn"
+        backend: rknn
+  t4_lay_up:
+    alias: "仰卧起身"
+    category: "起身类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_lay_up.yaml"
+    adapter_path: "policy/adapters/t4_lay_up.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_lay_up.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_lay_up.rknn"
+        backend: rknn
+  t4_face_up:
+    alias: "俯卧起身"
+    category: "起身类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/t4_face_up.yaml"
+    adapter_path: "policy/adapters/t4_face_up.py"
+    artifacts:
+      x86_64:
+        model_path: "model/t4_face_up.onnx"
+        backend: onnx
+      aarch64:
+        model_path: "model/t4_face_up.rknn"
+        backend: rknn

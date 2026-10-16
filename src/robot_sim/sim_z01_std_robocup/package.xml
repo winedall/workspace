@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>sim_z01_std_robocup</name>
+  <version>0.1.0</version>
+  <description>RoboCup multi-robot MuJoCo simulation: 6 x Z01_std_parallel_ankle on one soccer field</description>
+  <maintainer email="bileygr@todo.todo">bileygr</maintainer>
+  <license>Apache-2.0</license>
+
+  <!-- 构建工具依赖 -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- 构建和运行时依赖 -->
+  <depend>rclcpp</depend>
+  <depend>robot_interfaces</depend>
+  <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>yesense_interface</depend>
+  <depend>mj_sim</depend>
+  <depend>sim_common</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

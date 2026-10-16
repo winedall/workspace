@@ -1,0 +1,15 @@
+# Encos 低频维护命令：按厂家参数编号读取电机参数。
+# param_code 保持 Encos 协议定义，不在 robot_interfaces 中重新枚举。
+string joint_name
+uint8 param_code
+float32 timeout_sec
+---
+# 单值参数写入 value；范围参数写入 value_min/value_max。
+bool success
+string message
+uint16 motor_id
+uint8 param_code
+uint8 feedback_code
+float64 value
+float64 value_min
+float64 value_max

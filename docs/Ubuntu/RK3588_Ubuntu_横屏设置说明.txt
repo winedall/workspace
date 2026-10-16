@@ -1,0 +1,85 @@
+RK3588 Ubuntu 屏幕横屏设置说明
+================================
+适用环境：
+- RK3588 Ubuntu
+- X11
+- LightDM
+- DSI-1 屏幕
+- 原始分辨率：1080x1920
+- 目标：旋转后以 1920x1080 横屏显示
+
+已验证手动命令：
+xrandr --output DSI-1 --rotate left
+
+一、解决 LightDM 登录界面仍为竖屏
+--------------------------------
+1. 创建旋转脚本：
+sudo nano /usr/local/bin/rotate-display.sh
+
+写入：
+#!/bin/bash
+/usr/bin/xrandr --output DSI-1 --rotate left
+
+2. 添加执行权限：
+sudo chmod +x /usr/local/bin/rotate-display.sh
+
+3. 创建 LightDM 配置目录：
+sudo mkdir -p /etc/lightdm/lightdm.conf.d
+
+4. 创建 LightDM 显示配置：
+sudo nano /etc/lightdm/lightdm.conf.d/50-display-rotate.conf
+
+写入：
+[Seat:*]
+display-setup-script=/usr/local/bin/rotate-display.sh
+
+作用：
+开机进入 LightDM 登录界面时，会自动执行屏幕旋转，使登录界面显示为横屏。
+
+二、解决登录系统后主界面重新变回竖屏
+------------------------------------
+部分桌面环境会在用户登录后重新加载自己的显示配置，
+导致 LightDM 登录界面虽然已经是横屏，但进入桌面后又恢复成 1080x1920 竖屏。
+需要增加用户登录后的自动启动项。
+
+1. 创建 autostart 目录：
+mkdir -p ~/.config/autostart
+
+2. 创建自动启动文件：
+nano ~/.config/autostart/rotate-display.desktop
+
+写入：
+[Desktop Entry]
+Type=Application
+Name=Rotate DSI Display
+Comment=Rotate DSI display to landscape after login
+Exec=sh -c "sleep 5 && /usr/bin/xrandr --output DSI-1 --rotate left"
+Terminal=false
+X-GNOME-Autostart-enabled=true
+
+说明：
+sleep 5 是为了等待桌面环境自己的显示设置完成后，
+再执行 xrandr，避免被桌面环境重新恢复成竖屏。
+
+三、重启验证
+------------
+sudo reboot
+
+登录系统后，可执行：
+xrandr
+
+正常情况下应看到类似：
+Screen 0: ... current 1920 x 1080 ...
+DSI-1 connected primary ... left ...
+
+四、恢复默认竖屏
+----------------
+临时恢复：
+xrandr --output DSI-1 --rotate normal
+
+如需取消开机自动旋转，可删除：
+sudo rm /etc/lightdm/lightdm.conf.d/50-display-rotate.conf
+rm ~/.config/autostart/rotate-display.desktop
+
+然后重启：
+sudo reboot

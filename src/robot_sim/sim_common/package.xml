@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>sim_common</name>
+  <version>0.1.0</version>
+  <description>Shared MuJoCo simulation base classes for robot_sim packages</description>
+  <maintainer email="bileygr@todo.todo">bileygr</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>robot_interfaces</depend>
+  <depend>yesense_interface</depend>
+  <depend>sensor_msgs</depend>
+  <depend>mj_sim</depend>
+  <depend>eigen3_cmake_module</depend>
+  <depend>eigen</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

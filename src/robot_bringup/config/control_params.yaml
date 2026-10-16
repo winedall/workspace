@@ -1,0 +1,18 @@
+/**:
+  ros__parameters:
+    control_frequency_hz: 200.0          # 控制循环频率，单位 Hz
+    prepare_interpolation_cycles: 1500   # 插值总周期数，时长 = cycles / control_frequency_hz；1000@200Hz ≈ 5s
+    enable_rejected_command_topic: true  # 是否发布被过滤拒绝的指令到单独话题
+    # 踝关节控制模式（仅串联模型 + 并联环境时生效，例如真机 / 并联踝仿真 + walk 类模型）：
+    #   off    = 等效增益（默认）：串联空间 kp/kd 换算成并联电机增益，电机内部闭合 PD；
+    #   torque = 纯力矩前馈：control 层用模型自带 kp/kd 算串联空间力矩，经 J⁻ᵀ 映射后
+    #            以 effort 下发，kp/kd 置零由电机执行纯力矩。精度最高，但 PD 闭环移到
+    #            200 Hz 链路，受延迟约束，且断流时电机会保持最后一帧力矩；
+    #   hybrid = 混合前馈（推荐）：保留等效增益给出的 position/kp/kd（电机内闭合 PD），
+    #            只把"串联 PD 应产生 − 电机 PD 实际产生"的差额作为 effort 前馈补上。
+    #            刚度/阻尼/断流安全仍由电机内环承担，前馈只修正增益等效做不对的部分。
+    ankle_ff_mode: hybrid
+    # 前馈模式下单个踝电机的前馈力矩限幅（Nm）。真机踝电机 tor 量程为 ±30。
+    ankle_ff_torque_limit: 30.0
+    # 前馈权重：0 = 完全退化为等效增益，1 = 全量前馈。用于扫"稳定性 ↔ 精度"折中边界。
+    ankle_ff_scale: 0.0

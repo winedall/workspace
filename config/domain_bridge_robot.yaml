@@ -1,0 +1,112 @@
+name: robot_external_bridge
+
+topics:
+  # External -> Internal ###################################
+  /cmd_vel:
+    type: geometry_msgs/msg/Twist
+    from_domain: 100
+    to_domain: 10
+    qos:
+      reliability: best_effort
+      history: keep_last
+      depth: 5
+
+  /robot/input/intent:
+    type: robot_interfaces/msg/RobotIntent
+    from_domain: 100
+    to_domain: 10
+    qos:
+      reliability: reliable
+      history: keep_last
+      depth: 10
+
+  /robot/external/head_control:
+    type: robot_interfaces/msg/HeadControl
+    from_domain: 100
+    to_domain: 10
+    qos:
+      reliability: reliable
+      history: keep_last
+      depth: 10
+
+  /robot/audio/request:
+    type: robot_interfaces/msg/AudioRequest
+    from_domain: 100
+    to_domain: 10
+    qos:
+      reliability: reliable
+      history: keep_last
+      depth: 10
+
+  # Internal -> External ###################################
+  /robot/state:
+    type: robot_interfaces/msg/RobotState
+    from_domain: 10
+    to_domain: 100
+    qos:
+      reliability: best_effort
+      history: keep_last
+      depth: 5
+
+  /robot/driver/status:
+    type: robot_interfaces/msg/DriverStatus
+    from_domain: 10
+    to_domain: 100
+    qos:
+      reliability: best_effort
+      history: keep_last
+      depth: 5
+
+  /robot/driver/joint_states:
+    type: robot_interfaces/msg/JointStates
+    from_domain: 10
+    to_domain: 100
+    qos:
+      reliability: best_effort
+      history: keep_last
+      depth: 5
+
+  /robot/rl_manager/status:
+    type: robot_interfaces/msg/RlManagerStatus
+    from_domain: 10
+    to_domain: 100
+    qos:
+      reliability: best_effort
+      history: keep_last
+      depth: 5
+
+  /robot/version:
+    type: robot_interfaces/msg/VersionInfo
+    from_domain: 10
+    to_domain: 100
+    qos:
+      reliability: reliable
+      history: keep_last
+      depth: 10
+  
+  /robot/human_follow/follow_control:
+    type: robot_interfaces/msg/FollowControl
+    from_domain: 10
+    to_domain: 100
+    qos:
+      reliability: reliable
+      history: keep_last
+      depth: 10
+      
+  /robot/imu/nav_all:
+    type: yesense_interface/msg/NavAll
+    from_domain: 10
+    to_domain: 100
+    qos:
+      reliability: reliable
+      history: keep_last
+      depth: 10
+
+  /robot/head_pose:
+    type: geometry_msgs/msg/Pose
+    from_domain: 10
+    to_domain: 100
+    qos:
+      reliability: reliable
+      history: keep_last
+      depth: 10

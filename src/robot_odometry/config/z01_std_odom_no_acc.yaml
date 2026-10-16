@@ -1,0 +1,18 @@
+# 里程计模型参数：z01_std_odom_no_acc
+#
+# 输入 88 维，不含基座加速度：
+#   joint_pos_current(27) + joint_vel(27) + base_quat(4)
+#   + base_ang_vel(3) + joint_pos_previous(27)
+#
+# 训练来源：proprio_odometry/experiment_name=no_action_noise_no_acc
+model:
+  name: "z01_std_odom_no_acc"
+  type: "onnx"
+  control_frequency_hz: 50.0
+  observation_dim: 88
+  history_len: 50
+  odom_dim: 2
+  use_base_acceleration: false
+  # obs_layout 必填：注册表加载时与代码里的布局字符串逐字比对。
+  # 复制本文件加新模型时，这里是唯一会暴露语义错配的关卡。
+  obs_layout: "joint_pos_current(27) + joint_vel(27) + base_quat(4) + base_ang_vel(3) + joint_pos_previous(27)"

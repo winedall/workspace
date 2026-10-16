@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>robot_monitor</name>
+  <version>0.0.0</version>
+  <description>系统监控节点：采集 CPU、内存、磁盘、温度等系统信息，监控电池状态，超阈值时语音播报告警。</description>
+  <maintainer email="robot@zoomlion.com">Zoomlion Robot</maintainer>
+  <license>Proprietary</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>robot_common</depend>
+  <depend>robot_interfaces</depend>
+  <depend>usbcan_bridge_interface</depend>
+  <depend>std_srvs</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

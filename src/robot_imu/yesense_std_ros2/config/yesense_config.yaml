@@ -1,0 +1,8 @@
+yesense_pub:
+  ros__parameters:
+      serial_port: "/dev/robot_imu"
+      baud_rate: 460800
+      frame_id: "basic_id"
+      driver_type: "ros_serial"
+
+

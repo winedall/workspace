@@ -1,0 +1,34 @@
+/**:
+  ros__parameters:
+    # 是否启用文本转语音；关闭后 KIND_TIP/KIND_TEXT 不会播报，只保留 KIND_FILE 文件播放
+    tts_enabled: true
+    # 预留语速参数；当前 sherpa_onnx Matcha 后端主要通过 sherpa_length_scale 控制语速
+    tts_rate: 100
+    # 预留音量参数；当前播放链路会对生成 wav 做峰值归一化
+    tts_volume: 1.0
+    # TTS 模型目录；为空时使用安装目录 share/robot_audio/models/matcha-icefall-zh-baker
+    sherpa_model_dir: ''
+    # sherpa_onnx 推理线程数；增大可降低合成延迟，但会提高瞬时 CPU 占用
+    sherpa_num_threads: 2
+    # 推理后端；x86 CPU 部署保持 cpu
+    sherpa_provider: 'cpu'
+    # Matcha 噪声系数；默认 1.0 使用模型推荐值
+    sherpa_noise_scale: 1.0
+    # Matcha 语音长度系数；大于 1.0 变慢，小于 1.0 变快
+    sherpa_length_scale: 1.0
+    # TTS 后处理目标峰值；int16 满幅约为 32767，可按现场扬声器效果调低
+    tts_target_peak: 20000
+    # TTS 后处理最大放大倍数；可按现场扬声器效果调低，减少过度增益
+    tts_max_gain: 4.0
+    # 是否缓存 TTS 生成的 wav；相同文本后续直接播放缓存文件
+    tts_cache_enabled: true
+    # TTS 缓存目录；为空时使用 config/data/temps/tts_cache
+    tts_cache_dir: ''
+    # 播报队列最大长度；超过后新的请求会被拒绝
+    queue_size: 10
+    # 是否允许高优先级请求中断当前播报
+    interrupt_enabled: true
+    # 动作音频目录；为空时使用 config/data/actions
+    actions_dir: ''
+    # 系统提示文本清单；为空时使用 config/data/tips.yaml
+    tips_manifest: ''

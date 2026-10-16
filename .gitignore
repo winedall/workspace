@@ -1,0 +1,40 @@
+# ===== colcon 编译产物 =====
+build/
+install/
+log/
+
+# ===== 第三方依赖备份(大体积 .deb 等,非项目源码) =====
+backup/
+
+# ===== 运行日志 =====
+logs/
+*.log
+
+# ===== ROS 2 bag / 录制数据 =====
+*.db3
+*.db3-wal
+*.db3-shm
+*.mcap
+rosbag2_*/
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+
+# ===== 编译中间产物 =====
+*.o
+*.obj
+*.d
+
+# ===== 编辑器 / IDE =====
+.vscode/
+.idea/
+*.swp
+*~
+
+# ===== 系统文件 =====
+.DS_Store
+Thumbs.db

@@ -1,0 +1,170 @@
+<mujoco model="D015_poc_align">
+  <compiler angle="radian"/>
+  <option cone="pyramidal" impratio="5" gravity="0 0 -9.81"/>
+  <size njmax="500" nconmax="1000"/>
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" width="25" height="25" rgb1="0.9 0.95 1" rgb2="0.4 0.6 1" mark="none" markrgb="0 0 0" random="0.0"/>
+    <material name="groundmat" texture="grid" reflectance="0.1" texrepeat="50 50"/>
+    <material name="stairmat" rgba="0.6 0.4 0.2 1"/>
+  </asset>
+  <worldbody>
+    <body name="torso_link" pos="0 0 0.35">
+      <joint type="free"/>
+      <inertial pos="0.021112 0 -0.005366" mass="6.984" fullinertia="0.024909 0.121443 0.128701 -0.001295 0.000904 -6.7e-05"/>
+      <geom size="0.1881 0.04675 0.057" type="box" rgba="1 1 1 1" name="torso"/>
+      <body name="left_front_hip_roll_link" pos="0.1934 0.0465 0">
+        <inertial pos="-0.0054 0.00194 -0.000105" quat="0.488404 0.492979 0.509679 0.508587" mass="0.7783" diaginertia="0.00114775 0.000736999 0.000602254"/>
+        <joint name="left_front_hip_roll" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472" actuatorfrcrange="-23.7 23.7"/>
+        <geom size="0.046 0.02" pos="0 0.08 0" quat="0.707107 0.707107 0 0" type="cylinder" rgba="1 1 1 1"/>
+        <body name="left_front_hip_pitch_link" pos="0 0.0955 0">
+          <inertial pos="-0.00374 -0.0223 -0.0327" quat="0.85699 0.0543931 -0.0671154 0.508041" mass="1.1845" diaginertia="0.00590966 0.00561554 0.000901804"/>
+          <joint name="left_front_hip_pitch" pos="0 0 0" axis="0 1 0" range="-1.5708 3.4907" actuatorfrcrange="-23.7 23.7"/>
+          <geom size="0.055 0.01225 0.017" pos="0 0 -0.1065" quat="0.707107 0 0.707107 0" type="box" rgba="1 1 1 1"/>
+          <body name="left_front_knee_link" pos="0 0 -0.213">
+            <inertial pos="0.0061921 -0.000667036 -0.138055" quat="0.762844 0.0118782 0.013132 0.64634" mass="0.276552" diaginertia="0.00142998 0.00141013 6.27038e-05"/>
+            <joint name="left_front_knee" pos="0 0 0" axis="0 1 0" range="-2.7227 -0.83776" actuatorfrcrange="-35.55 35.55"/>
+            <geom size="0.012 0.06" pos="0.008 0 -0.06" quat="0.994493 0 -0.104807 0" type="cylinder" rgba="1 1 1 1"/>
+            <geom size="0.011 0.0325" pos="0.02 0 -0.148" quat="0.999688 0 0.0249974 0" type="cylinder"/>
+            <geom size="0.0155 0.015" pos="0.008013 0 -0.18745" quat="0.965093 0 0.261909 0" type="cylinder"/>
+            <body name="left_front_foot_fixed_link" pos="0 0 -0.213">
+              <inertial pos="0 0 0" mass="0.04" diaginertia="9.6e-06 9.6e-06 9.6e-06"/>
+              <geom name="left_front_foot_fixed_link_geom" size="0.022" pos="-0.002 0 0" rgba="1 1 1 1" type="sphere"/>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="right_front_hip_roll_link" pos="0.1934 -0.0465 0">
+        <inertial pos="-0.0054 -0.00194 -0.000105" quat="0.508587 0.509679 0.492979 0.488404" mass="0.7783" diaginertia="0.00114775 0.000736999 0.000602254"/>
+        <joint name="right_front_hip_roll" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472" actuatorfrcrange="-23.7 23.7"/>
+        <geom size="0.046 0.02" pos="0 -0.08 0" quat="0.707107 0.707107 0 0" type="cylinder" rgba="1 1 1 1"/>
+        <body name="right_front_hip_pitch_link" pos="0 -0.0955 0">
+          <inertial pos="-0.00374 0.0223 -0.0327" quat="0.508041 -0.0671154 0.0543931 0.85699" mass="1.1845" diaginertia="0.00590966 0.00561554 0.000901804"/>
+          <joint name="right_front_hip_pitch" pos="0 0 0" axis="0 1 0" range="-1.5708 3.4907" actuatorfrcrange="-23.7 23.7"/>
+          <geom size="0.055 0.01225 0.017" pos="0 0 -0.1065" quat="0.707107 0 0.707107 0" type="box" rgba="1 1 1 1"/>
+          <body name="right_front_knee_link" pos="0 0 -0.213">
+            <inertial pos="0.0061921 0.000667036 -0.138055" quat="0.64634 0.013132 0.0118782 0.762844" mass="0.276552" diaginertia="0.00142998 0.00141013 6.27038e-05"/>
+            <joint name="right_front_knee" pos="0 0 0" axis="0 1 0" range="-2.7227 -0.83776" actuatorfrcrange="-35.55 35.55"/>
+            <geom size="0.013 0.06" pos="0.01 0 -0.06" quat="0.995004 0 -0.0998334 0" type="cylinder" rgba="1 1 1 1"/>
+            <geom size="0.011 0.0325" pos="0.02 0 -0.148" quat="0.999688 0 0.0249974 0" type="cylinder"/>
+            <geom size="0.0155 0.015" pos="0.008013 0 -0.18745" quat="0.965093 0 0.261909 0" type="cylinder"/>
+            <body name="right_front_foot_fixed_link" pos="0 0 -0.213">
+              <inertial pos="0 0 0" mass="0.04" diaginertia="9.6e-06 9.6e-06 9.6e-06"/>
+              <geom name="right_front_foot_fixed_link_geom" size="0.022" pos="-0.002 0 0" rgba="1 1 1 1" type="sphere"/>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="left_rear_hip_roll_link" pos="-0.1934 0.0465 0">
+        <inertial pos="0.0054 0.00194 -0.000105" quat="0.488404 0.492979 0.509679 0.508587" mass="0.7783" diaginertia="0.00114775 0.000736999 0.000602254"/>
+        <joint name="left_rear_hip_roll" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472" actuatorfrcrange="-23.7 23.7"/>
+        <geom size="0.046 0.02" pos="0 0.08 0" quat="0.707107 0.707107 0 0" type="cylinder" rgba="1 1 1 1"/>
+        <body name="left_rear_hip_pitch_link" pos="0 0.0955 0">
+          <inertial pos="-0.00374 -0.0223 -0.0327" quat="0.85699 0.0543931 -0.0671154 0.508041" mass="1.1845" diaginertia="0.00590966 0.00561554 0.000901804"/>
+          <joint name="left_rear_hip_pitch" pos="0 0 0" axis="0 1 0" range="-0.5236 4.5379" actuatorfrcrange="-23.7 23.7"/>
+          <geom size="0.055 0.01225 0.017" pos="0 0 -0.1065" quat="0.707107 0 0.707107 0" type="box" rgba="1 1 1 1"/>
+          <body name="left_rear_knee_link" pos="0 0 -0.213">
+            <inertial pos="0.0061921 -0.000667036 -0.138055" quat="0.762844 0.0118782 0.013132 0.64634" mass="0.276552" diaginertia="0.00142998 0.00141013 6.27038e-05"/>
+            <joint name="left_rear_knee" pos="0 0 0" axis="0 1 0" range="-2.7227 -0.83776" actuatorfrcrange="-35.55 35.55"/>
+            <geom size="0.013 0.06" pos="0.01 0 -0.06" quat="0.995004 0 -0.0998334 0" type="cylinder" rgba="1 1 1 1"/>
+            <geom size="0.011 0.0325" pos="0.02 0 -0.148" quat="0.999688 0 0.0249974 0" type="cylinder"/>
+            <geom size="0.0155 0.015" pos="0.008013 0 -0.18745" quat="0.965093 0 0.261909 0" type="cylinder"/>
+            <body name="left_rear_foot_fixed_link" pos="0 0 -0.213">
+              <inertial pos="0 0 0" mass="0.04" diaginertia="9.6e-06 9.6e-06 9.6e-06"/>
+              <geom name="left_rear_foot_fixed_link_geom" size="0.022" pos="-0.002 0 0" rgba="1 1 1 1" type="sphere"/>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="right_rear_hip_roll_link" pos="-0.1934 -0.0465 0">
+        <inertial pos="0.0054 -0.00194 -0.000105" quat="0.508587 0.509679 0.492979 0.488404" mass="0.7783" diaginertia="0.00114775 0.000736999 0.000602254"/>
+        <joint name="right_rear_hip_roll" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472" actuatorfrcrange="-23.7 23.7"/>
+        <geom size="0.046 0.02" pos="0 -0.08 0" quat="0.707107 0.707107 0 0" type="cylinder" rgba="1 1 1 1"/>
+        <body name="right_rear_hip_pitch_link" pos="0 -0.0955 0">
+          <inertial pos="-0.00374 0.0223 -0.0327" quat="0.508041 -0.0671154 0.0543931 0.85699" mass="1.1845" diaginertia="0.00590966 0.00561554 0.000901804"/>
+          <joint name="right_rear_hip_pitch" pos="0 0 0" axis="0 1 0" range="-0.5236 4.5379" actuatorfrcrange="-23.7 23.7"/>
+          <geom size="0.055 0.01225 0.017" pos="0 0 -0.1065" quat="0.707107 0 0.707107 0" type="box" rgba="1 1 1 1"/>
+          <body name="right_rear_knee_link" pos="0 0 -0.213">
+            <inertial pos="0.0061921 0.000667036 -0.138055" quat="0.64634 0.013132 0.0118782 0.762844" mass="0.276552" diaginertia="0.00142998 0.00141013 6.27038e-05"/>
+            <joint name="right_rear_knee" pos="0 0 0" axis="0 1 0" range="-2.7227 -0.83776" actuatorfrcrange="-35.55 35.55"/>
+            <geom size="0.013 0.06" pos="0.01 0 -0.06" quat="0.995004 0 -0.0998334 0" type="cylinder" rgba="1 1 1 1"/>
+            <geom size="0.011 0.0325" pos="0.02 0 -0.148" quat="0.999688 0 0.0249974 0" type="cylinder"/>
+            <geom size="0.0155 0.015" pos="0.008013 0 -0.18745" quat="0.965093 0 0.261909 0" type="cylinder"/>
+            <body name="right_rear_foot_fixed_link" pos="0 0 -0.213">
+              <inertial pos="0 0 0" mass="0.04" diaginertia="9.6e-06 9.6e-06 9.6e-06"/>
+              <geom name="right_rear_foot_fixed_link_geom" size="0.022" pos="-0.002 0 0" rgba="1 1 1 1" type="sphere"/>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="head_upper_link" pos="0.285 0 0.01">
+        <inertial pos="0 0 0" mass="0.001" diaginertia="9.6e-06 9.6e-06 9.6e-06"/>
+        <geom name="head_upper_geom" size="0.05 0.045" type="cylinder"/>
+        <body name="head_lower_link" pos="0.008 0 -0.07">
+          <inertial pos="0 0 0" mass="0.001" diaginertia="9.6e-06 9.6e-06 9.6e-06"/>
+          <geom name="head_lower_geom" size="0.047" type="sphere"/>
+        </body>
+      </body>
+      <body name="imu_link" pos="-0.02557 0 0.04232">
+        <inertial pos="0 0 0" mass="0.001" diaginertia="0.0001 0.0001 0.0001"/>
+        <site name="imu" size="0.001" rgba="0.5 0.5 0.5 0.3"/>
+      </body>
+      <body name="radar_link" pos="0.28945 0 -0.046825" euler="0 2.8782 0">
+        <inertial pos="0 0 0" mass="0.001" diaginertia="0.0001 0.0001 0.0001"/>
+      </body>
+    </body>
+    <light name="global_light" pos="0 0 5" dir="-0.2 -0.2 -1" diffuse="1 1 1" specular="0.2 0.2 0.2" directional="true"/>
+    <geom name="ground" type="plane" pos="0 0 0" size="50 50 0.1" material="groundmat" condim="1" rgba="1 1 1 1" contype="1" conaffinity="1" friction="1.0 0.05 0.005" solimp="0.9 0.95 0.001" solref="0.005 1"/>
+    <body name="slope20_up" pos="1.5 5 -1">
+      <geom name="slope20_geom" type="box" size="2.0 2.5 0.684" pos="2.0 0 0.684" quat="0.9848 0 0.17365 0" material="stairmat" friction="1.0 0.05 0.005" contype="1" conaffinity="1"/>
+    </body>
+    <body name="slope20_down" pos="-1.75 5 -1">
+      <geom name="slope20_down_geom" type="box" size="2.0 2.5 0.684" pos="2.0 0 0.684" quat="0.9848 0 -0.17365 0" material="stairmat" friction="1.0 0.05 0.005" contype="1" conaffinity="1"/>
+    </body>
+    <!-- 楼梯地形（静态刚体，固定在世界坐标系），整体位于机器人前方 x=1.5m -->
+    <body name="stairs" pos="1.5 0 0">
+      <geom name="step1" type="box" size="0.15 0.75 0.050" pos="0.15 0 0.050" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="step2" type="box" size="0.15 0.75 0.100" pos="0.45 0 0.100" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="step3" type="box" size="0.15 0.75 0.150" pos="0.75 0 0.150" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="step4" type="box" size="0.15 0.75 0.200" pos="1.05 0 0.200" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="step5" type="box" size="0.15 0.75 0.250" pos="1.35 0 0.250" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="step6" type="box" size="0.15 0.75 0.300" pos="1.65 0 0.300" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="step7" type="box" size="0.15 0.75 0.350" pos="1.95 0 0.350" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="step8" type="box" size="0.15 0.75 0.400" pos="2.25 0 0.400" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="step9" type="box" size="0.15 0.75 0.450" pos="2.55 0 0.450" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="step10" type="box" size="0.15 0.75 0.500" pos="2.85 0 0.500" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <!-- 顶部 2m 平台 -->
+      <geom name="top_platform" type="box" size="1.0 2.5 0.500" pos="4.0 0 0.500" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <!-- 下楼 10 级 -->
+      <geom name="down_step1" type="box" size="0.15 2.5 0.500" pos="5.15 0 0.500" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="down_step2" type="box" size="0.15 2.5 0.450" pos="5.45 0 0.450" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="down_step3" type="box" size="0.15 2.5 0.400" pos="5.75 0 0.400" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="down_step4" type="box" size="0.15 2.5 0.350" pos="6.05 0 0.350" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="down_step5" type="box" size="0.15 2.5 0.300" pos="6.35 0 0.300" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="down_step6" type="box" size="0.15 2.5 0.250" pos="6.65 0 0.250" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="down_step7" type="box" size="0.15 2.5 0.200" pos="6.95 0 0.200" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="down_step8" type="box" size="0.15 2.5 0.150" pos="7.25 0 0.150" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="down_step9" type="box" size="0.15 2.5 0.100" pos="7.55 0 0.100" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      <geom name="down_step10" type="box" size="0.15 2.5 0.050" pos="7.85 0 0.050" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+    </body>
+  </worldbody>
+  <actuator>
+    <motor name="left_front_hip_roll_motor" joint="left_front_hip_roll" ctrlrange="-23.7 23.7" ctrllimited="true"/>
+    <motor name="left_front_hip_pitch_motor" joint="left_front_hip_pitch" ctrlrange="-23.7 23.7" ctrllimited="true"/>
+    <motor name="left_front_knee_motor" joint="left_front_knee" ctrlrange="-35.55 35.55" ctrllimited="true"/>
+    <motor name="right_front_hip_roll_motor" joint="right_front_hip_roll" ctrlrange="-23.7 23.7" ctrllimited="true"/>
+    <motor name="right_front_hip_pitch_motor" joint="right_front_hip_pitch" ctrlrange="-23.7 23.7" ctrllimited="true"/>
+    <motor name="right_front_knee_motor" joint="right_front_knee" ctrlrange="-35.55 35.55" ctrllimited="true"/>
+    <motor name="left_rear_hip_roll_motor" joint="left_rear_hip_roll" ctrlrange="-23.7 23.7" ctrllimited="true"/>
+    <motor name="left_rear_hip_pitch_motor" joint="left_rear_hip_pitch" ctrlrange="-23.7 23.7" ctrllimited="true"/>
+    <motor name="left_rear_knee_motor" joint="left_rear_knee" ctrlrange="-35.55 35.55" ctrllimited="true"/>
+    <motor name="right_rear_hip_roll_motor" joint="right_rear_hip_roll" ctrlrange="-23.7 23.7" ctrllimited="true"/>
+    <motor name="right_rear_hip_pitch_motor" joint="right_rear_hip_pitch" ctrlrange="-23.7 23.7" ctrllimited="true"/>
+    <motor name="right_rear_knee_motor" joint="right_rear_knee" ctrlrange="-35.55 35.55" ctrllimited="true"/>
+  </actuator>
+  <sensor>
+    <gyro name="base_ang_vel" site="imu" noise="0.005" cutoff="34.9"/>
+    <framequat name="base_rotation" objtype="site" objname="imu" noise="0.001"/>
+    <accelerometer name="base_acc" site="imu" noise="0.005"/>
+  </sensor>
+</mujoco>
+

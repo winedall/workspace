@@ -1,0 +1,64 @@
+# Z01_edm_add_head URDF → XML 生成配置
+# 复用 Z01_edm 的关节/执行器参数；补丁对齐 t4_std_add_head.xml 的手工细节。
+
+extends: ../Z01_edm/urdf_to_xml.yaml
+
+# 逐关节物理参数：覆盖继承的规则（列表整体替换），在 Z01_edm 规则基础上补充头部关节
+joints:
+  - {pattern: "*_shoulder_*",  armature: 0.0236, actuatorfrcrange: "-36.0 36.0"}
+  - {pattern: "*_elbow*",      armature: 0.0236, actuatorfrcrange: "-36.0 36.0"}
+  - {pattern: "*_wrist_yaw",   armature: 0.0236, actuatorfrcrange: 36}
+  - {pattern: "*_wrist_*",     armature: 0.0055, actuatorfrcrange: 12}
+  - {pattern: "waist_yaw",     armature: 0.0943, actuatorfrcrange: 120}
+  - {pattern: "waist_*",       armature: 0.0472, actuatorfrcrange: 36}
+  - {pattern: "*_hip_pitch",   armature: 0.0625, actuatorfrcrange: 130}
+  - {pattern: "*_knee*",       armature: 0.0625, actuatorfrcrange: 130}
+  - {pattern: "*_hip_roll",    armature: 0.0943, actuatorfrcrange: 120}
+  - {pattern: "*_hip_yaw",     armature: 0.0943, actuatorfrcrange: 120}
+  - {pattern: "*_ankle_pitch", armature: 0.0679444, actuatorfrcrange: 72}
+  - {pattern: "*_ankle_roll",  armature: 0.0229392, actuatorfrcrange: 36}
+  - {pattern: "head_pitch",    armature: 0.0055}
+  - {pattern: "head_yaw",      armature: 0.0055}
+
+motors:
+  rules:                      # 覆盖继承的规则（列表整体替换）
+    - {pattern: "waist_pitch", ctrlrange: 7200}
+    - {pattern: "waist_roll",  ctrlrange: 7200}
+    - {pattern: "head_*",      ctrlrange: 12}   # 对齐 t4_std_add_head.xml
+
+# 手工补丁（仅 --final 输出 Z01_edm_add_head.xml 时应用；patches 沿 extends 链累加，
+# 装饰调试几何已由 Z01_edm 的 patches 提供，此处不再重复列出）
+patches:
+  # --- 删除 fixed 关节折叠残留（导入器对球体省略 type 属性，用 not(@type) 选择）---
+  - {op: remove, xpath: "worldbody/body[@name='torso_link']/geom[not(@type)]"}
+  - {op: remove, xpath: "worldbody/.//body[@name='head_yaw_link']/geom[not(@type)]"}
+  - {op: remove, xpath: "worldbody/.//body[@name='left_ankle_roll_link']/geom[@type='box']"}
+  - {op: remove, xpath: "worldbody/.//body[@name='right_ankle_roll_link']/geom[@type='box']"}
+  # --- 手工调优值 ---
+  - {op: set, xpath: "worldbody/.//body[@name='head_pitch_link']", set: {pos: "0.00155 0 0.3155"}}
+  # --- 脚底碰撞：7 个 capsule 方案（替换 URDF 转录的 3 个 box）---
+  - xpath: "worldbody/.//body[@name='left_ankle_roll_link']"
+    append: |
+      <geom name="left_foot1_collision" type="capsule" size="0.01" fromto="0.12 -0.030 -0.0245 0.05 -0.030 -0.0245"/>
+      <geom name="left_foot2_collision" type="capsule" size="0.01" fromto="-0.046 -0.020 -0.0245 0.133 -0.020 -0.0245"/>
+      <geom name="left_foot3_collision" type="capsule" size="0.01" fromto="-0.056 -0.01 -0.0245 0.14 -0.01 -0.0245"/>
+      <geom name="left_foot4_collision" type="capsule" size="0.01" fromto="-0.056 0 -0.0245 0.143 0 -0.0245"/>
+      <geom name="left_foot5_collision" type="capsule" size="0.01" fromto="-0.056 0.01 -0.0245 0.14 0.01 -0.0245"/>
+      <geom name="left_foot6_collision" type="capsule" size="0.01" fromto="-0.046 0.020 -0.0245 0.133 0.020 -0.0245"/>
+      <geom name="left_foot7_collision" type="capsule" size="0.01" fromto="0.12 0.030 -0.0245 0.05 0.030 -0.0245"/>
+  - xpath: "worldbody/.//body[@name='right_ankle_roll_link']"
+    append: |
+      <geom name="right_foot1_collision" type="capsule" size="0.01" fromto="0.12 -0.030 -0.0245 0.05 -0.030 -0.0245"/>
+      <geom name="right_foot2_collision" type="capsule" size="0.01" fromto="-0.046 -0.020 -0.0245 0.133 -0.020 -0.0245"/>
+      <geom name="right_foot3_collision" type="capsule" size="0.01" fromto="-0.056 -0.01 -0.0245 0.14 -0.01 -0.0245"/>
+      <geom name="right_foot4_collision" type="capsule" size="0.01" fromto="-0.056 0 -0.0245 0.143 0 -0.0245"/>
+      <geom name="right_foot5_collision" type="capsule" size="0.01" fromto="-0.056 0.01 -0.0245 0.14 0.01 -0.0245"/>
+      <geom name="right_foot6_collision" type="capsule" size="0.01" fromto="-0.046 0.020 -0.0245 0.133 0.020 -0.0245"/>
+      <geom name="right_foot7_collision" type="capsule" size="0.01" fromto="0.12 0.030 -0.0245 0.05 0.030 -0.0245"/>
+
+extras:
+  # 深度相机挂在 head_yaw_link（导入器折叠 fixed 关节后该 body 仍在，位于 head_pitch_link 下）
+  - xpath: "worldbody/.//body[@name='head_yaw_link']"
+    append: |
+      <camera name="depth_cam" pos="0.069 0.01 0.068"
+              xyaxes="0 -1 0 0 0 1" fovy="58.29" resolution="64 36"/>

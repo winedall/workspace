@@ -1,0 +1,65 @@
+一、单次动作
+# 切换模型 - 比心
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_heart', priority: 0}" --once
+
+# 切换模型 - 敬礼
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_salute', priority: 0}" --once
+
+# 切换模型 - 挥手
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_hello', priority: 0}" --once
+
+# 切换模型 - 击掌
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_high_five', priority: 0}" --once
+
+# 切换模型 - 展览1
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_zl1', priority: 0}" --once
+
+# 切换模型 - 展览2
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_zl2', priority: 0}" --once
+
+# 切换模型 - 展览3
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_zl3', priority: 0}" --once
+
+# 切换模型 - 展览4
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_zl4', priority: 0}" --once
+
+# 切换模型 - 展览5
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_zl5', priority: 0}" --once
+
+# 切换模型 - 展览6
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_zl6', priority: 0}" --once
+
+二、持续动作
+# 切换模型 - 挥手
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_rhello', priority: 0}" --once
+
+# 切换模型 - 鼓掌
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_clap', priority: 0}" --once
+
+# 切换模型 - 握手
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_handshake', priority: 0}" --once
+
+# 切换模型 - 灵动
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_standby', priority: 0}" --once
+
+# 切换模型 - 迎宾1
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_yb1', priority: 0}" --once
+
+# 切换模型 - 迎宾2
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_yb2', priority: 0}" --once
+
+# 切换模型 - 迎宾2 - 左
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_yb2_left', priority: 0}" --once
+
+# 切换模型 - 迎宾3
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_yb3', priority: 0}" --once
+
+# 切换模型 - 迎宾3 - 左
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_yb3_left', priority: 0}" --once
+
+# 切换模型 - 迎宾4
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'switch_model', action: 't4_yb4', priority: 0}" --once
+
+# 优雅退出循环动作
+ros2 topic pub /robot/input/intent robot_interfaces/msg/RobotIntent "{source: 'teleop', intent_type: 'model', command: 'finish_loop', priority: 0}" --once
+

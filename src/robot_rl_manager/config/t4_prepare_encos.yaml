@@ -1,0 +1,120 @@
+prepare_profiles:
+  stand:
+    joints:
+      # head
+      - {joint_name: head_yaw, position: 0.0, kp: 80.0, kd: 2.0}
+      - {joint_name: head_pitch, position: 0.0, kp: 80.0, kd: 2.0}
+      # left_arm
+      - {joint_name: left_shoulder_pitch, position: 0.2, kp: 80.0, kd: 2.0}
+      - {joint_name: left_shoulder_roll, position: 0.13, kp: 80.0, kd: 2.0}
+      - {joint_name: left_shoulder_yaw, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: left_elbow, position: -0.43, kp: 40.0, kd: 2.0}
+      - {joint_name: left_wrist_yaw, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: left_wrist_pitch, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: left_wrist_roll, position: 0.0, kp: 40.0, kd: 2.0}
+      # right_arm
+      - {joint_name: right_shoulder_pitch, position: 0.2, kp: 80.0, kd: 2.0}
+      - {joint_name: right_shoulder_roll, position: -0.13, kp: 80.0, kd: 2.0}
+      - {joint_name: right_shoulder_yaw, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: right_elbow, position: -0.43, kp: 40.0, kd: 2.0}
+      - {joint_name: right_wrist_yaw, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: right_wrist_pitch, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: right_wrist_roll, position: 0.0, kp: 40.0, kd: 2.0}
+      # waist
+      - {joint_name: waist_pitch, position: 0.0, kp: 200.0, kd: 1.0}
+      - {joint_name: waist_roll, position: 0.0, kp: 200.0, kd: 1.0}
+      - {joint_name: waist_yaw, position: 0.0, kp: 200.0, kd: 5.0}
+      # left_leg
+      - {joint_name: left_hip_pitch, position: -0.2, kp: 300.0, kd: 5.0}
+      - {joint_name: left_hip_roll, position: 0.0, kp: 300.0, kd: 5.0}
+      - {joint_name: left_hip_yaw, position: 0.0, kp: 300.0, kd: 5.0}
+      - {joint_name: left_knee, position: 0.42, kp: 300.0, kd: 5.0}
+      - {joint_name: left_ankle_pitch, position: -0.24, kp: 300.0, kd: 2.0}
+      - {joint_name: left_ankle_roll, position: 0.0, kp: 300.0, kd: 2.0}
+      # right_leg
+      - {joint_name: right_hip_pitch, position: -0.2, kp: 300.0, kd: 5.0}
+      - {joint_name: right_hip_roll, position: 0.0, kp: 300.0, kd: 5.0}
+      - {joint_name: right_hip_yaw, position: 0.0, kp: 300.0, kd: 5.0}
+      - {joint_name: right_knee, position: 0.42, kp: 300.0, kd: 5.0}
+      - {joint_name: right_ankle_pitch, position: -0.24, kp: 300.0, kd: 2.0}
+      - {joint_name: right_ankle_roll, position: 0.0, kp: 300.0, kd: 2.0}
+
+  lie:
+    joints:
+      # head
+      - {joint_name: head_yaw, position: 0.0, kp: 80.0, kd: 2.0}
+      - {joint_name: head_pitch, position: 0.0, kp: 80.0, kd: 2.0}
+      # left_arm
+      - {joint_name: left_shoulder_pitch, position: 0.2, kp: 80.0, kd: 2.0}
+      - {joint_name: left_shoulder_roll, position: 0.13, kp: 80.0, kd: 2.0}
+      - {joint_name: left_shoulder_yaw, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: left_elbow, position: -0.43, kp: 40.0, kd: 2.0}
+      - {joint_name: left_wrist_yaw, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: left_wrist_pitch, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: left_wrist_roll, position: 0.0, kp: 40.0, kd: 2.0}
+      # right_arm
+      - {joint_name: right_shoulder_pitch, position: 0.2, kp: 80.0, kd: 2.0}
+      - {joint_name: right_shoulder_roll, position: -0.13, kp: 80.0, kd: 2.0}
+      - {joint_name: right_shoulder_yaw, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: right_elbow, position: -0.43, kp: 40.0, kd: 2.0}
+      - {joint_name: right_wrist_yaw, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: right_wrist_pitch, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: right_wrist_roll, position: 0.0, kp: 40.0, kd: 2.0}
+      # waist
+      - {joint_name: waist_pitch, position: 0.0, kp: 200.0, kd: 1.0}
+      - {joint_name: waist_roll, position: 0.0, kp: 200.0, kd: 1.0}
+      - {joint_name: waist_yaw, position: 0.0, kp: 200.0, kd: 5.0}
+      # left_leg
+      - {joint_name: left_hip_pitch, position: -0.2, kp: 300.0, kd: 5.0}
+      - {joint_name: left_hip_roll, position: 0.0, kp: 300.0, kd: 5.0}
+      - {joint_name: left_hip_yaw, position: 0.0, kp: 300.0, kd: 5.0}
+      - {joint_name: left_knee, position: 0.42, kp: 300.0, kd: 5.0}
+      - {joint_name: left_ankle_pitch, position: -0.24, kp: 300.0, kd: 2.0}
+      - {joint_name: left_ankle_roll, position: 0.0, kp: 300.0, kd: 2.0}
+      # right_leg
+      - {joint_name: right_hip_pitch, position: -0.2, kp: 300.0, kd: 5.0}
+      - {joint_name: right_hip_roll, position: 0.0, kp: 300.0, kd: 5.0}
+      - {joint_name: right_hip_yaw, position: 0.0, kp: 300.0, kd: 5.0}
+      - {joint_name: right_knee, position: 0.42, kp: 300.0, kd: 5.0}
+      - {joint_name: right_ankle_pitch, position: -0.24, kp: 300.0, kd: 2.0}
+      - {joint_name: right_ankle_roll, position: 0.0, kp: 300.0, kd: 2.0}
+  
+  face:
+    joints:
+      # head
+      - {joint_name: head_yaw, position: 0.0, kp: 80.0, kd: 2.0}
+      - {joint_name: head_pitch, position: 0.0, kp: 80.0, kd: 2.0}
+      # left_arm
+      - {joint_name: left_shoulder_pitch, position: 0.2, kp: 80.0, kd: 2.0}
+      - {joint_name: left_shoulder_roll, position: 0.13, kp: 80.0, kd: 2.0}
+      - {joint_name: left_shoulder_yaw, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: left_elbow, position: -0.43, kp: 40.0, kd: 2.0}
+      - {joint_name: left_wrist_yaw, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: left_wrist_pitch, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: left_wrist_roll, position: 0.0, kp: 40.0, kd: 2.0}
+      # right_arm
+      - {joint_name: right_shoulder_pitch, position: 0.2, kp: 80.0, kd: 2.0}
+      - {joint_name: right_shoulder_roll, position: -0.13, kp: 80.0, kd: 2.0}
+      - {joint_name: right_shoulder_yaw, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: right_elbow, position: -0.43, kp: 40.0, kd: 2.0}
+      - {joint_name: right_wrist_yaw, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: right_wrist_pitch, position: 0.0, kp: 40.0, kd: 2.0}
+      - {joint_name: right_wrist_roll, position: 0.0, kp: 40.0, kd: 2.0}
+      # waist
+      - {joint_name: waist_pitch, position: 0.0, kp: 200.0, kd: 1.0}
+      - {joint_name: waist_roll, position: 0.0, kp: 200.0, kd: 1.0}
+      - {joint_name: waist_yaw, position: 0.0, kp: 200.0, kd: 5.0}
+      # left_leg
+      - {joint_name: left_hip_pitch, position: -0.2, kp: 300.0, kd: 5.0}
+      - {joint_name: left_hip_roll, position: 0.0, kp: 300.0, kd: 5.0}
+      - {joint_name: left_hip_yaw, position: 0.0, kp: 300.0, kd: 5.0}
+      - {joint_name: left_knee, position: 0.42, kp: 300.0, kd: 5.0}
+      - {joint_name: left_ankle_pitch, position: -0.24, kp: 300.0, kd: 2.0}
+      - {joint_name: left_ankle_roll, position: 0.0, kp: 300.0, kd: 2.0}
+      # right_leg
+      - {joint_name: right_hip_pitch, position: -0.2, kp: 300.0, kd: 5.0}
+      - {joint_name: right_hip_roll, position: 0.0, kp: 300.0, kd: 5.0}
+      - {joint_name: right_hip_yaw, position: 0.0, kp: 300.0, kd: 5.0}
+      - {joint_name: right_knee, position: 0.42, kp: 300.0, kd: 5.0}
+      - {joint_name: right_ankle_pitch, position: -0.24, kp: 300.0, kd: 2.0}
+      - {joint_name: right_ankle_roll, position: 0.0, kp: 300.0, kd: 2.0}

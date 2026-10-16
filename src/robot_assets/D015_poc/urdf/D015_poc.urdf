@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="D015_poc">
+
+  <material name="black"><color rgba="0 0 0 1"/></material>
+
+  <material name="silver"><color rgba="0.91372549 0.91372549 0.84705882 1"/></material>
+
+  <material name="red"><color rgba="0.8 0 0 1"/></material>
+
+  <material name="white"><color rgba="1 1 1 1"/></material>
+
+  <link name="torso_link">
+    <inertial>
+      <origin xyz="0.021112 0 -0.005366" rpy="0 0 0"/>
+      <mass value="6.984"/>
+      <inertia ixx="0.024909" ixy="-0.001295" ixz="0.000904" iyy="0.121443" iyz="-0.000067" izz="0.128701"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry><mesh filename="../dae/base.dae"/></geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.3762 0.0935 0.114"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="head_upper" type="fixed" dont_collapse="true">
+    <origin xyz="0.285 0 0.01" rpy="0 0 0"/>
+    <parent link="torso_link"/>
+    <child link="head_upper_link"/>
+  </joint>
+
+  <link name="head_upper_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia ixx="0.0000096" ixy="0" ixz="0" iyy="0.0000096" iyz="0" izz="0.0000096"/>
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.09"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="head_lower" type="fixed" dont_collapse="true">
+    <origin xyz="0.008 0 -0.07" rpy="0 0 0"/>
+    <parent link="head_upper_link"/>
+    <child link="head_lower_link"/>
+  </joint>
+
+  <link name="head_lower_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia ixx="0.0000096" ixy="0" ixz="0" iyy="0.0000096" iyz="0" izz="0.0000096"/>
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><sphere radius="0.047"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="imu" type="fixed">
+    <origin xyz="-0.02557 0 0.04232" rpy="0 0 0"/>
+    <parent link="torso_link"/>
+    <child link="imu_link"/>
+  </joint>
+
+  <link name="imu_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.001 0.001 0.001"/></geometry>
+      <material name="red"/>
+    </visual>
+  </link>
+
+  <joint name="radar" type="fixed">
+    <origin xyz="0.28945 0 -0.046825" rpy="0 2.8782 0"/>
+    <parent link="torso_link"/>
+    <child link="radar_link"/>
+  </joint>
+
+  <link name="radar_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <!-- ========== left_front_leg ========== -->
+  <joint name="left_front_hip_roll" type="revolute">
+    <origin xyz="0.1934 0.0465 0" rpy="0 0 0"/>
+    <parent link="torso_link"/>
+    <child link="left_front_hip_roll_link"/>
+    <axis xyz="1 0 0"/>
+    <dynamics damping="0" friction="0"/>
+    <limit lower="-1.0472" upper="1.0472" effort="23.7" velocity="30.1"/>
+  </joint>
+
+  <link name="left_front_hip_roll_link">
+    <inertial>
+      <origin xyz="-0.0054 0.00194 -0.000105" rpy="0 0 0"/>
+      <mass value="0.7783"/>
+      <inertia ixx="0.000603" ixy="-0.0000201" ixz="0.0000007" iyy="0.001147" iyz="0.0000015" izz="0.000737"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry><mesh filename="../dae/hip.dae"/></geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0.08 0" rpy="1.5707963267948966 0 0"/>
+      <geometry><cylinder radius="0.046" length="0.04"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="left_front_hip_fixed" type="fixed">
+    <origin xyz="0 0.0955 0" rpy="0 0 0"/>
+    <parent link="left_front_hip_roll_link"/>
+    <child link="left_front_hip_fixed_link"/>
+  </joint>
+
+  <link name="left_front_hip_fixed_link"/>
+
+  <joint name="left_front_hip_pitch" type="revolute">
+    <origin xyz="0 0.0955 0" rpy="0 0 0"/>
+    <parent link="left_front_hip_roll_link"/>
+    <child link="left_front_hip_pitch_link"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0" friction="0"/>
+    <limit lower="-1.5708" upper="3.4907" effort="23.7" velocity="30.1"/>
+  </joint>
+
+  <link name="left_front_hip_pitch_link">
+    <inertial>
+      <origin xyz="-0.00374 -0.0223 -0.0327" rpy="0 0 0"/>
+      <mass value="1.1845"/>
+      <inertia ixx="0.005665" ixy="0.0000751" ixz="0.0003013" iyy="0.005712" iyz="0.0007928" izz="0.00105"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry><mesh filename="../dae/thigh.dae"/></geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.1065" rpy="0 1.5707963267948966 0"/>
+      <geometry><box size="0.11 0.0245 0.034"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="left_front_knee" type="revolute">
+    <origin xyz="0 0 -0.213" rpy="0 0 0"/>
+    <parent link="left_front_hip_pitch_link"/>
+    <child link="left_front_knee_link"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0" friction="0"/>
+    <limit lower="-2.7227" upper="-0.83776" effort="35.55" velocity="20.07"/>
+  </joint>
+
+  <link name="left_front_knee_link">
+    <inertial>
+      <origin xyz="0.00548 -0.000975 -0.115" rpy="0 0 0"/>
+      <mass value="0.276552"/>
+      <inertia ixx="0.001004" ixy="0.0000034" ixz="-0.0000371" iyy="0.001018" iyz="-0.0000028" izz="0.000044"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry><mesh filename="../dae/calf.dae"/></geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0.008 0 -0.06" rpy="0 -0.21 0"/>
+      <geometry><cylinder radius="0.012" length="0.12"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="left_front_knee_collision_1" type="fixed">
+    <origin xyz="0.02 0 -0.148" rpy="0 0.05 0"/>
+    <parent link="left_front_knee_link"/>
+    <child link="left_front_knee_collision_1_link"/>
+  </joint>
+
+  <link name="left_front_knee_collision_1_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.011" length="0.065"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="left_front_knee_collision_2" type="fixed">
+    <origin xyz="-0.01 0 -0.04" rpy="0 0.48 0"/>
+    <parent link="left_front_knee_collision_1_link"/>
+    <child link="left_front_knee_collision_2_link"/>
+  </joint>
+
+  <link name="left_front_knee_collision_2_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.0155" length="0.03"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="left_front_foot_fixed" type="fixed" dont_collapse="true">
+    <origin xyz="0 0 -0.213" rpy="0 0 0"/>
+    <parent link="left_front_knee_link"/>
+    <child link="left_front_foot_fixed_link"/>
+  </joint>
+
+  <link name="left_front_foot_fixed_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.04"/>
+      <inertia ixx="0.0000096" ixy="0" ixz="0" iyy="0.0000096" iyz="0" izz="0.0000096"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry><mesh filename="../dae/foot.dae"/></geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.002 0 0" rpy="0 0 0"/>
+      <geometry><sphere radius="0.022"/></geometry>
+    </collision>
+  </link>
+
+  <!-- ========== right_front_leg ========== -->
+  <joint name="right_front_hip_roll" type="revolute">
+    <origin xyz="0.1934 -0.0465 0" rpy="0 0 0"/>
+    <parent link="torso_link"/>
+    <child link="right_front_hip_roll_link"/>
+    <axis xyz="1 0 0"/>
+    <dynamics damping="0" friction="0"/>
+    <limit lower="-1.0472" upper="1.0472" effort="23.7" velocity="30.1"/>
+  </joint>
+
+  <link name="right_front_hip_roll_link">
+    <inertial>
+      <origin xyz="-0.0054 -0.00194 -0.000105" rpy="0 0 0"/>
+      <mass value="0.7783"/>
+      <inertia ixx="0.000603" ixy="0.0000201" ixz="0.0000007" iyy="0.001147" iyz="-0.0000015" izz="0.000737"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="-1.57079632679 0 0"/>
+      <geometry><mesh filename="../dae/hip.dae"/></geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 -0.08 0" rpy="1.5707963267948966 0 0"/>
+      <geometry><cylinder radius="0.046" length="0.04"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="right_front_hip_fixed" type="fixed">
+    <origin xyz="0 -0.0955 0" rpy="0 0 0"/>
+    <parent link="right_front_hip_roll_link"/>
+    <child link="right_front_hip_fixed_link"/>
+  </joint>
+
+  <link name="right_front_hip_fixed_link"/>
+
+  <joint name="right_front_hip_pitch" type="revolute">
+    <origin xyz="0 -0.0955 0" rpy="0 0 0"/>
+    <parent link="right_front_hip_roll_link"/>
+    <child link="right_front_hip_pitch_link"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0" friction="0"/>
+    <limit lower="-1.5708" upper="3.4907" effort="23.7" velocity="30.1"/>
+  </joint>
+
+  <link name="right_front_hip_pitch_link">
+    <inertial>
+      <origin xyz="-0.00374 0.0223 -0.0327" rpy="0 0 0"/>
+      <mass value="1.1845"/>
+      <inertia ixx="0.005665" ixy="-0.0000751" ixz="0.0003013" iyy="0.005712" iyz="-0.0007928" izz="0.00105"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry><mesh filename="../dae/thigh_mirror.dae"/></geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.1065" rpy="0 1.5707963267948966 0"/>
+      <geometry><box size="0.11 0.0245 0.034"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="right_front_knee" type="revolute">
+    <origin xyz="0 0 -0.213" rpy="0 0 0"/>
+    <parent link="right_front_hip_pitch_link"/>
+    <child link="right_front_knee_link"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0" friction="0"/>
+    <limit lower="-2.7227" upper="-0.83776" effort="35.55" velocity="20.07"/>
+  </joint>
+
+  <link name="right_front_knee_link">
+    <inertial>
+      <origin xyz="0.00548 0.000975 -0.115" rpy="0 0 0"/>
+      <mass value="0.276552"/>
+      <inertia ixx="0.001004" ixy="-0.0000034" ixz="-0.0000371" iyy="0.001018" iyz="0.0000028" izz="0.000044"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry><mesh filename="../dae/calf_mirror.dae"/></geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <origin xyz="0.01 0 -0.06" rpy="0 -0.2 0"/>
+      <geometry><cylinder radius="0.013" length="0.12"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="right_front_knee_collision_1" type="fixed">
+    <origin xyz="0.02 0 -0.148" rpy="0 0.05 0"/>
+    <parent link="right_front_knee_link"/>
+    <child link="right_front_knee_collision_1_link"/>
+  </joint>
+
+  <link name="right_front_knee_collision_1_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.011" length="0.065"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="right_front_knee_collision_2" type="fixed">
+    <origin xyz="-0.01 0 -0.04" rpy="0 0.48 0"/>
+    <parent link="right_front_knee_collision_1_link"/>
+    <child link="right_front_knee_collision_2_link"/>
+  </joint>
+
+  <link name="right_front_knee_collision_2_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.0155" length="0.03"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="right_front_foot_fixed" type="fixed" dont_collapse="true">
+    <origin xyz="0 0 -0.213" rpy="0 0 0"/>
+    <parent link="right_front_knee_link"/>
+    <child link="right_front_foot_fixed_link"/>
+  </joint>
+
+  <link name="right_front_foot_fixed_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.04"/>
+      <inertia ixx="0.0000096" ixy="0" ixz="0" iyy="0.0000096" iyz="0" izz="0.0000096"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry><mesh filename="../dae/foot.dae"/></geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.002 0 0" rpy="0 0 0"/>
+      <geometry><sphere radius="0.022"/></geometry>
+    </collision>
+  </link>
+
+  <!-- ========== left_rear_leg ========== -->
+  <joint name="left_rear_hip_roll" type="revolute">
+    <origin xyz="-0.1934 0.0465 0" rpy="0 0 0"/>
+    <parent link="torso_link"/>
+    <child link="left_rear_hip_roll_link"/>
+    <axis xyz="1 0 0"/>
+    <dynamics damping="0" friction="0"/>
+    <limit lower="-1.0472" upper="1.0472" effort="23.7" velocity="30.1"/>
+  </joint>
+
+  <link name="left_rear_hip_roll_link">
+    <inertial>
+      <origin xyz="0.0054 0.00194 -0.000105" rpy="0 0 0"/>
+      <mass value="0.7783"/>
+      <inertia ixx="0.000603" ixy="-0.0000201" ixz="0.0000007" iyy="0.001147" iyz="0.0000015" izz="0.000737"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="-1.57079632679 0 3.14159265359"/>
+      <geometry><mesh filename="../dae/hip.dae"/></geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0.08 0" rpy="1.5707963267948966 0 0"/>
+      <geometry><cylinder radius="0.046" length="0.04"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="left_rear_hip_fixed" type="fixed">
+    <origin xyz="0 0.0955 0" rpy="0 0 0"/>
+    <parent link="left_rear_hip_roll_link"/>
+    <child link="left_rear_hip_fixed_link"/>
+  </joint>
+
+  <link name="left_rear_hip_fixed_link"/>
+
+  <joint name="left_rear_hip_pitch" type="revolute">
+    <origin xyz="0 0.0955 0" rpy="0 0 0"/>
+    <parent link="left_rear_hip_roll_link"/>
+    <child link="left_rear_hip_pitch_link"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0" friction="0"/>
+    <limit lower="-0.5236" upper="4.5379" effort="23.7" velocity="30.1"/>
+  </joint>
+
+  <link name="left_rear_hip_pitch_link">
+    <inertial>
+      <origin xyz="-0.00374 -0.0223 -0.0327" rpy="0 0 0"/>
+      <mass value="1.1845"/>
+      <inertia ixx="0.005665" ixy="0.0000751" ixz="0.0003013" iyy="0.005712" iyz="0.0007928" izz="0.00105"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry><mesh filename="../dae/thigh.dae"/></geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.1065" rpy="0 1.5707963267948966 0"/>
+      <geometry><box size="0.11 0.0245 0.034"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="left_rear_knee" type="revolute">
+    <origin xyz="0 0 -0.213" rpy="0 0 0"/>
+    <parent link="left_rear_hip_pitch_link"/>
+    <child link="left_rear_knee_link"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0" friction="0"/>
+    <limit lower="-2.7227" upper="-0.83776" effort="35.55" velocity="20.07"/>
+  </joint>
+
+  <link name="left_rear_knee_link">
+    <inertial>
+      <origin xyz="0.00548 -0.000975 -0.115" rpy="0 0 0"/>
+      <mass value="0.276552"/>
+      <inertia ixx="0.001004" ixy="0.0000034" ixz="-0.0000371" iyy="0.001018" iyz="-0.0000028" izz="0.000044"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry><mesh filename="../dae/calf.dae"/></geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <origin xyz="0.01 0 -0.06" rpy="0 -0.2 0"/>
+      <geometry><cylinder radius="0.013" length="0.12"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="left_rear_knee_collision_1" type="fixed">
+    <origin xyz="0.02 0 -0.148" rpy="0 0.05 0"/>
+    <parent link="left_rear_knee_link"/>
+    <child link="left_rear_knee_collision_1_link"/>
+  </joint>
+
+  <link name="left_rear_knee_collision_1_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.011" length="0.065"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="left_rear_knee_collision_2" type="fixed">
+    <origin xyz="-0.01 0 -0.04" rpy="0 0.48 0"/>
+    <parent link="left_rear_knee_collision_1_link"/>
+    <child link="left_rear_knee_collision_2_link"/>
+  </joint>
+
+  <link name="left_rear_knee_collision_2_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.0155" length="0.03"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="left_rear_foot_fixed" type="fixed" dont_collapse="true">
+    <origin xyz="0 0 -0.213" rpy="0 0 0"/>
+    <parent link="left_rear_knee_link"/>
+    <child link="left_rear_foot_fixed_link"/>
+  </joint>
+
+  <link name="left_rear_foot_fixed_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.04"/>
+      <inertia ixx="0.0000096" ixy="0" ixz="0" iyy="0.0000096" iyz="0" izz="0.0000096"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry><mesh filename="../dae/foot.dae"/></geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.002 0 0" rpy="0 0 0"/>
+      <geometry><sphere radius="0.022"/></geometry>
+    </collision>
+  </link>
+
+  <!-- ========== right_rear_leg ========== -->
+  <joint name="right_rear_hip_roll" type="revolute">
+    <origin xyz="-0.1934 -0.0465 0" rpy="0 0 0"/>
+    <parent link="torso_link"/>
+    <child link="right_rear_hip_roll_link"/>
+    <axis xyz="1 0 0"/>
+    <dynamics damping="0" friction="0"/>
+    <limit lower="-1.0472" upper="1.0472" effort="23.7" velocity="30.1"/>
+  </joint>
+
+  <link name="right_rear_hip_roll_link">
+    <inertial>
+      <origin xyz="0.0054 -0.00194 -0.000105" rpy="0 0 0"/>
+      <mass value="0.7783"/>
+      <inertia ixx="0.000603" ixy="0.0000201" ixz="0.0000007" iyy="0.001147" iyz="-0.0000015" izz="0.000737"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 3.14159265359"/>
+      <geometry><mesh filename="../dae/hip.dae"/></geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 -0.08 0" rpy="1.5707963267948966 0 0"/>
+      <geometry><cylinder radius="0.046" length="0.04"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="right_rear_hip_fixed" type="fixed">
+    <origin xyz="0 -0.0955 0" rpy="0 0 0"/>
+    <parent link="right_rear_hip_roll_link"/>
+    <child link="right_rear_hip_fixed_link"/>
+  </joint>
+
+  <link name="right_rear_hip_fixed_link"/>
+
+  <joint name="right_rear_hip_pitch" type="revolute">
+    <origin xyz="0 -0.0955 0" rpy="0 0 0"/>
+    <parent link="right_rear_hip_roll_link"/>
+    <child link="right_rear_hip_pitch_link"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0" friction="0"/>
+    <limit lower="-0.5236" upper="4.5379" effort="23.7" velocity="30.1"/>
+  </joint>
+
+  <link name="right_rear_hip_pitch_link">
+    <inertial>
+      <origin xyz="-0.00374 0.0223 -0.0327" rpy="0 0 0"/>
+      <mass value="1.1845"/>
+      <inertia ixx="0.005665" ixy="-0.0000751" ixz="0.0003013" iyy="0.005712" iyz="-0.0007928" izz="0.00105"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry><mesh filename="../dae/thigh_mirror.dae"/></geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.1065" rpy="0 1.5707963267948966 0"/>
+      <geometry><box size="0.11 0.0245 0.034"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="right_rear_knee" type="revolute">
+    <origin xyz="0 0 -0.213" rpy="0 0 0"/>
+    <parent link="right_rear_hip_pitch_link"/>
+    <child link="right_rear_knee_link"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0" friction="0"/>
+    <limit lower="-2.7227" upper="-0.83776" effort="35.55" velocity="20.07"/>
+  </joint>
+
+  <link name="right_rear_knee_link">
+    <inertial>
+      <origin xyz="0.00548 0.000975 -0.115" rpy="0 0 0"/>
+      <mass value="0.276552"/>
+      <inertia ixx="0.001004" ixy="-0.0000034" ixz="-0.0000371" iyy="0.001018" iyz="0.0000028" izz="0.000044"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry><mesh filename="../dae/calf_mirror.dae"/></geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <origin xyz="0.01 0 -0.06" rpy="0 -0.2 0"/>
+      <geometry><cylinder radius="0.013" length="0.12"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="right_rear_knee_collision_1" type="fixed">
+    <origin xyz="0.02 0 -0.148" rpy="0 0.05 0"/>
+    <parent link="right_rear_knee_link"/>
+    <child link="right_rear_knee_collision_1_link"/>
+  </joint>
+
+  <link name="right_rear_knee_collision_1_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.011" length="0.065"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="right_rear_knee_collision_2" type="fixed">
+    <origin xyz="-0.01 0 -0.04" rpy="0 0.48 0"/>
+    <parent link="right_rear_knee_collision_1_link"/>
+    <child link="right_rear_knee_collision_2_link"/>
+  </joint>
+
+  <link name="right_rear_knee_collision_2_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.0155" length="0.03"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="right_rear_foot_fixed" type="fixed" dont_collapse="true">
+    <origin xyz="0 0 -0.213" rpy="0 0 0"/>
+    <parent link="right_rear_knee_link"/>
+    <child link="right_rear_foot_fixed_link"/>
+  </joint>
+
+  <link name="right_rear_foot_fixed_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.04"/>
+      <inertia ixx="0.0000096" ixy="0" ixz="0" iyy="0.0000096" iyz="0" izz="0.0000096"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57079632679 0 0"/>
+      <geometry><mesh filename="../dae/foot.dae"/></geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.002 0 0" rpy="0 0 0"/>
+      <geometry><sphere radius="0.022"/></geometry>
+    </collision>
+  </link>
+
+</robot>

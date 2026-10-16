@@ -1,0 +1,7 @@
+# 目标 RL 模型名称，必须是已加载或可由 rl_manager 识别的模型。
+string model_name
+---
+# 是否成功接受模型切换请求。
+bool success
+# 成功或失败的说明。
+string message

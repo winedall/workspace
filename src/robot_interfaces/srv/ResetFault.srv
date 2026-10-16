@@ -1,0 +1,7 @@
+# 故障复位原因或人工确认说明。
+string reason
+---
+# 是否成功接受故障复位请求。
+bool success
+# 成功或失败的说明。
+string message

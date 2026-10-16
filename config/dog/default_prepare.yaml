@@ -1,0 +1,19 @@
+prepare_profiles:
+  stand:
+    joints:
+      # 左前腿
+      - {joint_name: FL_hip_joint, position: 0.0, kp: 120.0, kd: 2.0}
+      - {joint_name: FL_thigh_joint, position: 0.8, kp: 120.0, kd: 2.0}
+      - {joint_name: FL_calf_joint, position: -1.5, kp: 150.0, kd: 2.0}
+      # 右前腿
+      - {joint_name: FR_hip_joint, position: 0.0, kp: 120, kd: 2.0}
+      - {joint_name: FR_thigh_joint, position: 0.8, kp: 120.0, kd: 2.0}
+      - {joint_name: FR_calf_joint, position: -1.5, kp: 150.0, kd: 2.0}
+      # 左后腿
+      - {joint_name: RL_hip_joint, position: 0.0, kp: 120.0, kd: 2.0}
+      - {joint_name: RL_thigh_joint, position: 0.8, kp: 120.0, kd: 2.0}
+      - {joint_name: RL_calf_joint, position: -1.5, kp: 150.0, kd: 2.0}
+      # 右后腿
+      - {joint_name: RR_hip_joint, position: 0.0, kp: 120.0, kd: 2.0}
+      - {joint_name: RR_thigh_joint, position: 0.8, kp: 120.0, kd: 2.0}
+      - {joint_name: RR_calf_joint, position: -1.5, kp: 150.0, kd: 2.0}

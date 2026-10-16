@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}部署管理{% endblock %}
+{% block heading %}部署管理{% endblock %}
+{% block content %}
+<div class="d-flex justify-between align-center mb-16">
+<div></div>
+<button class="btn btn-primary" onclick="showNewModal()">+ 新建部署</button>
+</div>
+<div class="card">
+<table><thead><tr><th>ID</th><th>设备</th><th>版本</th><th>起始版本</th><th>状态</th><th>进度</th><th>错误</th><th>创建时间</th><th>操作</th></tr></thead><tbody id="deploymentsBody"></tbody></table>
+</div>
+<div class="modal" id="newModal">
+<div class="modal-content">
+<h3>新建部署</h3>
+<div class="form-group"><label>发布版本</label><select id="f_release"></select></div>
+<div class="form-group"><label>目标设备</label><div id="deviceCheckboxes" style="max-height:200px;overflow-y:auto;border:1px solid #d9d9d9;border-radius:6px;padding:8px;"></div></div>
+<div class="form-actions">
+<button class="btn" onclick="hideNewModal()">取消</button>
+<button class="btn btn-primary" onclick="createDeployment()">创建</button>
+</div>
+</div>
+</div>
+
+<script>
+var releasesCache = [];
+var devicesCache = [];
+var pollTimer = null;
+var latestSuccessPerDevice = {};
+var devicesWithActiveDeployments = {};
+
+function showNewModal() {
+    document.getElementById('newModal').classList.add('show');
+    loadFormData();
+}
+function hideNewModal() { document.getElementById('newModal').classList.remove('show'); }
+
+function loadDeployments() {
+    apiFetch('/api/v1/deployments/').then(function(r) { return r.json(); }).then(function(data) {
+        // 计算每个设备最新 SUCCEEDED 记录
+        latestSuccessPerDevice = {};
+        devicesWithActiveDeployments = {};
+        var terminal = {'SUCCEEDED':1,'FAILED':1,'ROLLED_BACK':1,'RECOVERY_REQUIRED':1,'CANCELLED':1};
+        (data || []).forEach(function(d) {
+            if (d.status === 'SUCCEEDED') {
+                var prev = latestSuccessPerDevice[d.device_id];
+                if (!prev || d.id > prev) {
+                    latestSuccessPerDevice[d.device_id] = d.id;
+                }
+            }
+            if (terminal[d.status] !== 1) {
+                devicesWithActiveDeployments[d.device_id] = 1;
+            }
+        });
+        var tbody = document.getElementById('deploymentsBody');
+        if (!tbody) return;
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="99" class="empty-state"><p>暂无数据</p></td></tr>';
+            return;
+        }
+        tbody.innerHTML = '';
+        data.forEach(function(row) {
+            var tr = document.createElement('tr');
+            tbody.appendChild(tr);
+            renderRow(tr, row);
+        });
+    }).catch(function(err) {
+        var tbody = document.getElementById('deploymentsBody');
+        if (tbody) tbody.innerHTML = '<tr><td colspan="99" style="text-align:center;padding:20px;color:#cf1322;">数据加载失败</td></tr>';
+    });
+    if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+    pollTimer = setTimeout(schedulePoll, 100);
+}
+
+function schedulePoll() {
+    var tbody = document.getElementById('deploymentsBody');
+    if (!tbody) return;
+    var rows = tbody.querySelectorAll('tr');
+    var hasActive = false;
+    var terminal = {'SUCCEEDED':1,'FAILED':1,'ROLLED_BACK':1,'RECOVERY_REQUIRED':1,'CANCELLED':1};
+    rows.forEach(function(tr) {
+        var statusEl = tr.querySelector('td:nth-child(5)');
+        if (statusEl && terminal[statusEl.textContent.trim()] !== 1) hasActive = true;
+    });
+    if (hasActive) {
+        pollTimer = setTimeout(loadDeployments, 2000);
+    }
+}
+function renderRow(tr, d) {
+    var statusClass = 'badge-default';
+    var terminal = {'SUCCEEDED':1,'FAILED':1,'ROLLED_BACK':1,'RECOVERY_REQUIRED':1,'CANCELLED':1};
+    var running = {'TRANSFERRING':1,'VERIFYING':1,'STAGED':1,'SAFETY_CHECKING':1,'STOPPING':1,'SWITCHING':1,'STARTING':1,'HEALTH_CHECKING':1};
+    if (d.status === 'SUCCEEDED') statusClass = 'badge-success';
+    else if (d.status in running || d.status === 'CREATED') statusClass = 'badge-warning';
+    else if (d.status in {'FAILED':1,'RECOVERY_REQUIRED':1}) statusClass = 'badge-danger';
+    else if (d.status === 'ROLLED_BACK') statusClass = 'badge-warning';
+
+    var progressStr = (d.progress || 0) + '%';
+    var errorStr = d.error ? escapeHtml(d.error) : '-';
+    var rollbackBtn = '';
+    if (d.status === 'SUCCEEDED' && latestSuccessPerDevice[d.device_id] === d.id && !devicesWithActiveDeployments[d.device_id]) {
+        rollbackBtn = '<button class="btn btn-sm btn-danger" onclick="rollbackDeployment(' + d.id + ')">回滚</button>';
+    }
+    tr.innerHTML = '<td>' + d.id + '</td>' +
+        '<td><strong>' + escapeHtml(d.device_id || '-') + '</strong></td>' +
+        '<td>' + escapeHtml(d.release_version || '-') + '</td>' +
+        '<td>' + escapeHtml(d.from_version || '-') + '</td>' +
+        '<td><span class="badge ' + statusClass + '">' + escapeHtml(d.status) + '</span></td>' +
+        '<td>' + progressStr + '</td>' +
+        '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;">' + errorStr + '</td>' +
+        '<td>' + localTime(d.created_at) + '</td>' +
+        '<td>' + rollbackBtn + '</td>';
+}
+
+function loadFormData() {
+    var token = getCookie('token');
+    var headers = token ? {'Authorization': 'Bearer ' + token} : {};
+    Promise.all([
+        fetch('/api/v1/releases/', {headers: headers}).then(function(r){return r.json();}),
+        fetch('/api/v1/devices/', {headers: headers}).then(function(r){return r.json();})
+    ]).then(function(results) {
+        releasesCache = results[0] || [];
+        devicesCache = results[1] || [];
+        var sel = document.getElementById('f_release');
+        sel.innerHTML = '<option value="">-- 请选择 --</option>';
+        releasesCache.forEach(function(r) {
+            sel.innerHTML += '<option value="' + r.id + '">' + escapeHtml(r.version) + ' (' + escapeHtml(r.platform) + ')</option>';
+        });
+        var div = document.getElementById('deviceCheckboxes');
+        div.innerHTML = '';
+        devicesCache.forEach(function(d) {
+            div.innerHTML += '<label style="display:flex;padding:4px 8px;cursor:pointer;align-items:center;border-bottom:1px solid #f0f0f0;"><span style="flex:1">' + escapeHtml(d.id) + '</span><input type="checkbox" value="' + d.id + '" style="width:16px;height:16px;flex-shrink:0;margin:0;padding:0;border:none;outline:none;box-shadow:none"></label>';
+        });
+    }).catch(function(){});
+}
+
+function createDeployment() {
+    var releaseId = parseInt(document.getElementById('f_release').value);
+    if (!releaseId) { alert('请选择发布版本'); return; }
+    var deviceIds = [];
+    var checkboxes = document.querySelectorAll('#deviceCheckboxes input:checked');
+    checkboxes.forEach(function(cb) { deviceIds.push(cb.value); });
+    if (deviceIds.length === 0) { alert('请至少选择一个设备'); return; }
+    hideNewModal();
+    apiFetch('/api/v1/deployments/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({release_id: releaseId, device_ids: deviceIds})
+    }).then(function(r) {
+        if (!r.ok) throw new Error('Failed');
+        loadDeployments();
+    }).catch(function(e) { alert('创建部署失败: ' + e.message); });
+}
+
+function rollbackDeployment(deploymentId) {
+    if (!confirm('确定回滚部署 #' + deploymentId + ' 吗？')) return;
+    apiFetch('/api/v1/deployments/' + deploymentId + '/rollback', {method: 'POST'}).then(function(r) {
+        if (!r.ok) throw new Error('Failed');
+        loadDeployments();
+    }).catch(function(e) { alert('回滚失败: ' + e.message); });
+}
+
+loadDeployments();
+</script>
+{% endblock %}

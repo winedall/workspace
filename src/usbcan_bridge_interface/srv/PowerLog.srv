@@ -1,0 +1,12 @@
+# 电源板日志记录控制
+# start=true时开始记录，start=false时停止记录
+bool start           # true=开始记录, false=停止记录
+string filepath      # 日志文件路径，为空时自动生成
+int32 interval_ms    # 记录间隔(毫秒)，默认1000
+bool threshold_mode  # 是否启用阈值模式，true=超过阈值才记录，false=定时无条件记录
+float64[] voltage_thresholds  # 各通道电压阈值(V)，索引0-5对应CH0_0到CH2_1
+float64[] current_thresholds  # 各通道电流阈值(A)，索引0-5对应CH0_0到CH2_1
+float32 temp_threshold        # 温度阈值(°C)，超过此温度触发记录
+---
+bool success         # 操作是否成功
+string message       # 结果描述信息

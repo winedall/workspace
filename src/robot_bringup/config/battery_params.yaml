@@ -1,0 +1,7 @@
+# robot_battery 节点参数
+# 通过 SocketCAN 连接 BMS，发布 battery/info。
+/**:
+  ros__parameters:
+    device: "can0"              # SocketCAN 接口名称
+    poll_rate_hz: 10.0          # BMS 查询频率 (Hz)
+    publish_rate_hz: 10.0       # 电池信息发布频率 (Hz)

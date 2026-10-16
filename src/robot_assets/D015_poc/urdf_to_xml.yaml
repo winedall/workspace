@@ -1,0 +1,176 @@
+# D015_poc（原理样机）URDF → XML 生成配置
+# 执行器与地面参数对齐手写 d2.xml；关节物理参数走内置 default 兜底。
+
+freejoint:
+  pos: "0 0 0.35"        # 基座初始高度（对齐 d2.xml）
+
+option:
+  cone: pyramidal
+  impratio: 5
+  gravity: "0 0 -9.81"
+
+motors:
+  ctrlrange: effort      # 直接取 URDF limit effort（髋/大腿 23.7，小腿 35.55）
+
+ground:                  # d2 式地面：棋盘格 + 单方向光
+  texture:
+    name: grid
+    type: 2d
+    builtin: checker
+    width: 25
+    height: 25
+    rgb1: "0.9 0.95 1"
+    rgb2: "0.4 0.6 1"
+    mark: none
+    markrgb: "0 0 0"
+  material:
+    name: groundmat
+    texture: grid
+    texrepeat: "50 50"
+    reflectance: 0.1
+    texuniform: null     # 去掉内置默认的 texuniform
+  skybox: null           # d2 式无天空盒
+  geom:
+    name: ground
+    type: plane
+    pos: "0 0 0"
+    size: "50 50 0.1"
+    material: groundmat
+    rgba: "1 1 1 1"
+    contype: 1
+    conaffinity: 1
+    friction: "1.0 0.05 0.005"
+    solimp: "0.9 0.95 0.001"
+    solref: "0.005 1"
+  lights:
+    - {name: global_light, pos: "0 0 5", dir: "-0.2 -0.2 -1",
+       diffuse: "1 1 1", specular: "0.2 0.2 0.2", directional: true}
+
+imu_site:
+  pos: "urdf:imu"        # 取 URDF imu 关节 origin（-0.02557 0 0.04232）
+  size: 0.001
+
+# 手工补丁（仅 --final 输出 D015_poc.xml 时应用）：对齐手写 d2.xml 的物理/地形细节。
+# 生成器把 fixed 关节折叠进父 body、碰撞几何颜色不同、且无地形——以下恢复原状。
+patches:
+  # --- 关节阻尼为 0（手写 d2.xml 无 default 段）---
+  - {op: remove, xpath: "default"}
+  # --- 地面纹理细节 ---
+  - {op: set, xpath: "asset/texture[@name='grid']", set: {random: "0.0"}}
+  # --- 地形材质与静态刚体（楼梯/坡道）---
+  - xpath: "asset"
+    append: |
+      <material name="stairmat" rgba="0.6 0.4 0.2 1"/>
+  - xpath: "worldbody"
+    append: |
+      <body name="slope20_up" pos="1.5 5 -1">
+        <geom name="slope20_geom" type="box" size="2.0 2.5 0.684" pos="2.0 0 0.684"
+              quat="0.9848 0 0.17365 0" material="stairmat"
+              friction="1.0 0.05 0.005" contype="1" conaffinity="1"/>
+      </body>
+      <body name="slope20_down" pos="-1.75 5 -1">
+        <geom name="slope20_down_geom" type="box" size="2.0 2.5 0.684" pos="2.0 0 0.684"
+              quat="0.9848 0 -0.17365 0" material="stairmat"
+              friction="1.0 0.05 0.005" contype="1" conaffinity="1"/>
+      </body>
+      <!-- 楼梯地形（静态刚体，固定在世界坐标系），整体位于机器人前方 x=1.5m -->
+      <body name="stairs" pos="1.5 0 0">
+        <geom name="step1" type="box" size="0.15 0.75 0.050" pos="0.15 0 0.050" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="step2" type="box" size="0.15 0.75 0.100" pos="0.45 0 0.100" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="step3" type="box" size="0.15 0.75 0.150" pos="0.75 0 0.150" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="step4" type="box" size="0.15 0.75 0.200" pos="1.05 0 0.200" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="step5" type="box" size="0.15 0.75 0.250" pos="1.35 0 0.250" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="step6" type="box" size="0.15 0.75 0.300" pos="1.65 0 0.300" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="step7" type="box" size="0.15 0.75 0.350" pos="1.95 0 0.350" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="step8" type="box" size="0.15 0.75 0.400" pos="2.25 0 0.400" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="step9" type="box" size="0.15 0.75 0.450" pos="2.55 0 0.450" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="step10" type="box" size="0.15 0.75 0.500" pos="2.85 0 0.500" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <!-- 顶部 2m 平台 -->
+        <geom name="top_platform" type="box" size="1.0 2.5 0.500" pos="4.0 0 0.500" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <!-- 下楼 10 级 -->
+        <geom name="down_step1" type="box" size="0.15 2.5 0.500" pos="5.15 0 0.500" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="down_step2" type="box" size="0.15 2.5 0.450" pos="5.45 0 0.450" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="down_step3" type="box" size="0.15 2.5 0.400" pos="5.75 0 0.400" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="down_step4" type="box" size="0.15 2.5 0.350" pos="6.05 0 0.350" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="down_step5" type="box" size="0.15 2.5 0.300" pos="6.35 0 0.300" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="down_step6" type="box" size="0.15 2.5 0.250" pos="6.65 0 0.250" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="down_step7" type="box" size="0.15 2.5 0.200" pos="6.95 0 0.200" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="down_step8" type="box" size="0.15 2.5 0.150" pos="7.25 0 0.150" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="down_step9" type="box" size="0.15 2.5 0.100" pos="7.55 0 0.100" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+        <geom name="down_step10" type="box" size="0.15 2.5 0.050" pos="7.85 0 0.050" material="stairmat" contype="1" conaffinity="1" friction="1.0 0.05 0.005"/>
+      </body>
+  # --- torso：删折叠的头部 geom 与 imu site，恢复独立 body，碰撞改白 ---
+  - {op: remove, xpath: "worldbody/body[@name='torso_link']/geom[@type='cylinder']"}
+  - {op: remove, xpath: "worldbody/body[@name='torso_link']/geom[not(@type)]"}
+  - {op: remove, xpath: "worldbody/body[@name='torso_link']/site[@name='imu']"}
+  - {op: set, xpath: "worldbody/body[@name='torso_link']/geom[@type='box']", set: {name: torso, rgba: "1 1 1 1"}}
+  - xpath: "worldbody/body[@name='torso_link']"
+    append: |
+      <body name="head_upper_link" pos="0.285 0 0.01">
+        <inertial pos="0 0 0" mass="0.001" diaginertia="9.6e-06 9.6e-06 9.6e-06"/>
+        <geom name="head_upper_geom" size="0.05 0.045" type="cylinder"/>
+        <body name="head_lower_link" pos="0.008 0 -0.07">
+          <inertial pos="0 0 0" mass="0.001" diaginertia="9.6e-06 9.6e-06 9.6e-06"/>
+          <geom name="head_lower_geom" size="0.047" type="sphere"/>
+        </body>
+      </body>
+      <body name="imu_link" pos="-0.02557 0 0.04232">
+        <inertial pos="0 0 0" mass="0.001" diaginertia="0.0001 0.0001 0.0001"/>
+        <site name="imu" size="0.001" rgba="0.5 0.5 0.5 0.3"/>
+      </body>
+      <body name="radar_link" pos="0.28945 0 -0.046825" euler="0 2.8782 0">
+        <inertial pos="0 0 0" mass="0.001" diaginertia="0.0001 0.0001 0.0001"/>
+      </body>
+  # --- 四腿：碰撞改白、膝部惯性恢复（足部折叠前的值）、足部拆为独立 body ---
+  - {op: set, xpath: "worldbody/.//body[@name='left_front_hip_roll_link']/geom[@type='cylinder']", set: {rgba: "1 1 1 1"}}
+  - {op: set, xpath: "worldbody/.//body[@name='right_front_hip_roll_link']/geom[@type='cylinder']", set: {rgba: "1 1 1 1"}}
+  - {op: set, xpath: "worldbody/.//body[@name='left_rear_hip_roll_link']/geom[@type='cylinder']", set: {rgba: "1 1 1 1"}}
+  - {op: set, xpath: "worldbody/.//body[@name='right_rear_hip_roll_link']/geom[@type='cylinder']", set: {rgba: "1 1 1 1"}}
+  - {op: set, xpath: "worldbody/.//body[@name='left_front_hip_pitch_link']/geom[@type='box']", set: {rgba: "1 1 1 1"}}
+  - {op: set, xpath: "worldbody/.//body[@name='right_front_hip_pitch_link']/geom[@type='box']", set: {rgba: "1 1 1 1"}}
+  - {op: set, xpath: "worldbody/.//body[@name='left_rear_hip_pitch_link']/geom[@type='box']", set: {rgba: "1 1 1 1"}}
+  - {op: set, xpath: "worldbody/.//body[@name='right_rear_hip_pitch_link']/geom[@type='box']", set: {rgba: "1 1 1 1"}}
+  - {op: set, xpath: "worldbody/.//body[@name='left_front_knee_link']/geom[@type='cylinder'][1]", set: {rgba: "1 1 1 1"}}
+  - {op: set, xpath: "worldbody/.//body[@name='right_front_knee_link']/geom[@type='cylinder'][1]", set: {rgba: "1 1 1 1"}}
+  - {op: set, xpath: "worldbody/.//body[@name='left_rear_knee_link']/geom[@type='cylinder'][1]", set: {rgba: "1 1 1 1"}}
+  - {op: set, xpath: "worldbody/.//body[@name='right_rear_knee_link']/geom[@type='cylinder'][1]", set: {rgba: "1 1 1 1"}}
+  - {op: set, xpath: "worldbody/.//body[@name='left_front_knee_link']/inertial",
+     set: {pos: "0.0061921 -0.000667036 -0.138055", quat: "0.762844 0.0118782 0.013132 0.64634",
+           mass: "0.276552", diaginertia: "0.00142998 0.00141013 6.27038e-05"}}
+  - {op: set, xpath: "worldbody/.//body[@name='right_front_knee_link']/inertial",
+     set: {pos: "0.0061921 0.000667036 -0.138055", quat: "0.64634 0.013132 0.0118782 0.762844",
+           mass: "0.276552", diaginertia: "0.00142998 0.00141013 6.27038e-05"}}
+  - {op: set, xpath: "worldbody/.//body[@name='left_rear_knee_link']/inertial",
+     set: {pos: "0.0061921 -0.000667036 -0.138055", quat: "0.762844 0.0118782 0.013132 0.64634",
+           mass: "0.276552", diaginertia: "0.00142998 0.00141013 6.27038e-05"}}
+  - {op: set, xpath: "worldbody/.//body[@name='right_rear_knee_link']/inertial",
+     set: {pos: "0.0061921 0.000667036 -0.138055", quat: "0.64634 0.013132 0.0118782 0.762844",
+           mass: "0.276552", diaginertia: "0.00142998 0.00141013 6.27038e-05"}}
+  - {op: remove, xpath: "worldbody/.//body[@name='left_front_knee_link']/geom[not(@type)]"}
+  - {op: remove, xpath: "worldbody/.//body[@name='right_front_knee_link']/geom[not(@type)]"}
+  - {op: remove, xpath: "worldbody/.//body[@name='left_rear_knee_link']/geom[not(@type)]"}
+  - {op: remove, xpath: "worldbody/.//body[@name='right_rear_knee_link']/geom[not(@type)]"}
+  - xpath: "worldbody/.//body[@name='left_front_knee_link']"
+    append: |
+      <body name="left_front_foot_fixed_link" pos="0 0 -0.213">
+        <inertial pos="0 0 0" mass="0.04" diaginertia="9.6e-06 9.6e-06 9.6e-06"/>
+        <geom name="left_front_foot_fixed_link_geom" size="0.022" pos="-0.002 0 0" rgba="1 1 1 1" type="sphere"/>
+      </body>
+  - xpath: "worldbody/.//body[@name='right_front_knee_link']"
+    append: |
+      <body name="right_front_foot_fixed_link" pos="0 0 -0.213">
+        <inertial pos="0 0 0" mass="0.04" diaginertia="9.6e-06 9.6e-06 9.6e-06"/>
+        <geom name="right_front_foot_fixed_link_geom" size="0.022" pos="-0.002 0 0" rgba="1 1 1 1" type="sphere"/>
+      </body>
+  - xpath: "worldbody/.//body[@name='left_rear_knee_link']"
+    append: |
+      <body name="left_rear_foot_fixed_link" pos="0 0 -0.213">
+        <inertial pos="0 0 0" mass="0.04" diaginertia="9.6e-06 9.6e-06 9.6e-06"/>
+        <geom name="left_rear_foot_fixed_link_geom" size="0.022" pos="-0.002 0 0" rgba="1 1 1 1" type="sphere"/>
+      </body>
+  - xpath: "worldbody/.//body[@name='right_rear_knee_link']"
+    append: |
+      <body name="right_rear_foot_fixed_link" pos="0 0 -0.213">
+        <inertial pos="0 0 0" mass="0.04" diaginertia="9.6e-06 9.6e-06 9.6e-06"/>
+        <geom name="right_rear_foot_fixed_link_geom" size="0.022" pos="-0.002 0 0" rgba="1 1 1 1" type="sphere"/>
+      </body>

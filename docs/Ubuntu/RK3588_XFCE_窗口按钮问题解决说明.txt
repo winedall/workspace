@@ -1,0 +1,108 @@
+RK3588 Ubuntu XFCE 窗口按钮与拖拽问题解决说明
+==============================================
+适用环境：
+- RK3588 Ubuntu
+- XFCE / Xubuntu
+- X11
+- 现象：
+  1. 文件夹、终端等窗口没有最大化/最小化/关闭按钮
+  2. 窗口不能拖动
+  3. 窗口边缘不能拖拽调整大小
+
+一、确认桌面环境
+----------------
+执行：
+echo "XDG_CURRENT_DESKTOP=$XDG_CURRENT_DESKTOP"
+echo "DESKTOP_SESSION=$DESKTOP_SESSION"
+echo "XDG_SESSION_DESKTOP=$XDG_SESSION_DESKTOP"
+echo "XDG_SESSION_TYPE=$XDG_SESSION_TYPE"
+
+本机确认结果：
+XDG_CURRENT_DESKTOP=XFCE
+DESKTOP_SESSION=xubuntu
+XDG_SESSION_DESKTOP=xubuntu
+XDG_SESSION_TYPE=x11
+
+二、确认 XFCE 窗口管理器是否运行
+-------------------------------
+执行：
+ps -ef | grep -E "xfwm4|openbox|marco|kwin|mutter|metacity" | grep -v grep
+如果没有 xfwm4 进程，说明 XFCE 的窗口管理器没有正常运行。
+检查 xfwm4 是否已安装：
+which xfwm4
+正常应输出：
+/usr/bin/xfwm4
+
+三、直接启动 xfwm4 时遇到 GLX 报错
+---------------------------------
+直接执行：
+xfwm4 --replace &
+
+本机出现类似报错：
+glx: failed to create drisw screen
+Could not create GLX context
+BadValue ...
+
+原因：
+RK3588 当前 X11 / GPU 图形栈无法正常创建 xfwm4 合成器需要的 GLX 上下文，
+导致 xfwm4 启动后崩溃。
+
+四、解决方法：关闭 XFCE compositor
+----------------------------------
+执行：
+xfwm4 --replace --compositor=off &
+
+如果执行成功，窗口应立即恢复：
+- 标题栏
+- 最大化按钮
+- 最小化按钮
+- 关闭按钮
+- 窗口拖动
+- 窗口边缘缩放
+
+五、永久关闭 XFCE 合成器
+------------------------
+执行：
+xfconf-query -c xfwm4 -p /general/use_compositing -s false
+
+六、设置登录后自动启动 xfwm4
+----------------------------
+1. 创建 autostart 目录：
+mkdir -p ~/.config/autostart
+
+2. 创建自动启动文件：
+nano ~/.config/autostart/xfwm4.desktop
+
+3. 写入：
+[Desktop Entry]
+Type=Application
+Name=XFCE Window Manager
+Comment=Start XFCE window manager without compositor
+Exec=/usr/bin/xfwm4 --replace --compositor=off
+Terminal=false
+StartupNotify=false
+
+4. 保存并退出，然后重启：
+sudo reboot
+
+七、重启后验证
+--------------
+登录系统后执行：
+ps -ef | grep xfwm4 | grep -v grep
+
+正常应看到类似：
+/usr/bin/xfwm4 --replace --compositor=off
+
+最终效果
+--------
+开机
+  ↓
+LightDM 登录界面横屏
+  ↓
+登录 XFCE
+  ↓
+主界面自动横屏
+  ↓
+xfwm4 自动启动（关闭 compositor）
+  ↓
+窗口标题栏、最大化/最小化、拖动、缩放功能正常

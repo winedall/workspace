@@ -1,0 +1,43 @@
+action_audio:
+  enabled: false
+  bindings:
+    t4_zl1:
+      - file: "哈喽初来乍到请多多关照_16k.wav"
+        delay_sec: 0.0
+        priority: 120
+        interrupt: false
+    t4_zl2:
+      - file: "属于我的战斗开始了_16k.wav"
+        delay_sec: 0.0
+        priority: 120
+        interrupt: false
+    t4_zl3:
+      - file: "我在这_16k.wav"
+        delay_sec: 0.0
+        priority: 120
+        interrupt: false
+    t4_zl4:
+      - file: "忙完你的忙你的好累_16k.wav"
+        delay_sec: 0.0
+        priority: 120
+        interrupt: false
+    t4_zl5:
+      - file: "原定工作已经忙完了晚安玛卡巴卡_16k.wav"
+        delay_sec: 0.0
+        priority: 120
+        interrupt: false
+    t4_zl6:
+      - file: "属于我的战斗开始了_16k.wav"
+        delay_sec: 0.0
+        priority: 120
+        interrupt: false
+    t4_heart:
+      - file: "我在这_16k.wav"
+        delay_sec: 0.2
+        priority: 120
+        interrupt: false
+    t4_high_five:
+      - file: "哈喽初来乍到请多多关照_16k.wav"
+        delay_sec: 0.0
+        priority: 120
+        interrupt: false

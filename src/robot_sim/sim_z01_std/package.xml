@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>sim_z01_std</name>
+  <version>0.1.0</version>
+  <description>Simulation package for the Z01_std (量产版) robot using Mujoco</description>
+  <maintainer email="bileygr@todo.todo">bileygr</maintainer>
+  <license>Apache-2.0</license> <!-- 请更改为实际使用的许可证 -->
+
+  <!-- 构建工具依赖 -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- 构建和运行时依赖 -->
+  <depend>rclcpp</depend>
+  <depend>robot_interfaces</depend>
+  <depend>mj_sim</depend>
+  <depend>sim_common</depend>
+  <!-- 如果 yesense_imu 是 ROS2 包，使用下面的依赖 -->
+  <depend>yesense_interface</depend>
+
+  <!-- 测试依赖 -->
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

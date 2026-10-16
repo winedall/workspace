@@ -1,0 +1,28 @@
+# 机器狗强化学习模型注册表。
+# model_switch_rules 定义模型切换规则。
+model_switch_rules:
+  pairs: []
+
+models:
+  d4_flat:
+    alias: "行走"
+    category: "走跑类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/d4_flat.yaml"
+    adapter_path: "policy/adapters/d4_flat.py"
+    artifacts:
+      x86_64:
+        model_path: "model/d4_flat.pt"
+        backend: pt
+  d4_getup:
+    alias: "起身"
+    category: "起身类"
+    duration_sec: 0.0
+    has_duration: false
+    config_path: "config/d4_getup.yaml"
+    adapter_path: "policy/adapters/d4_getup.py"
+    artifacts:
+      x86_64:
+        model_path: "model/d4_getup.onnx"
+        backend: onnx

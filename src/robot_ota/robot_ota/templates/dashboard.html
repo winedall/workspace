@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}仪表盘{% endblock %}
+{% block heading %}仪表盘{% endblock %}
+{% block content %}
+<div class="stat-cards" id="statCards">
+<div class="stat-card"><div class="stat-value" id="statDevices">-</div><div class="stat-label">设备总数</div></div>
+<div class="stat-card"><div class="stat-value" id="statReleases">-</div><div class="stat-label">版本数量</div></div>
+<div class="stat-card"><div class="stat-value" id="statOnline">-</div><div class="stat-label">在线设备</div></div>
+<div class="stat-card"><div class="stat-value" id="statDeployments">-</div><div class="stat-label">活跃部署</div></div>
+</div>
+<div class="card">
+<h3>最近活动</h3>
+<table><thead><tr><th>ID</th><th>操作</th><th>操作者</th><th>目标</th><th>详情</th><th>时间</th></tr></thead><tbody id="auditBody"></tbody></table>
+<div id="auditPagination" style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:16px;font-size:14px;">
+    <button class="btn btn-sm" id="prevPage" onclick="goToPage(currentPage-1)">‹ 上一页</button>
+    <span>第 <input type="number" id="pageInput" style="width:48px;text-align:center;padding:4px;border:1px solid #d9d9d9;border-radius:4px;" onchange="goToPage(parseInt(this.value)||1)"> 页 / 共 <span id="totalPages">1</span> 页</span>
+    <button class="btn btn-sm" id="nextPage" onclick="goToPage(currentPage+1)">下一页 ›</button>
+</div>
+</div>
+<script>
+var pageSize = 20;
+var currentPage = 1;
+var totalPages = 1;
+
+function loadAuditPage(page) {
+    var offset = (page - 1) * pageSize;
+    apiFetch('/api/v1/audit/?limit=' + pageSize + '&offset=' + offset).then(function(r){return r.json();}).then(function(resp) {
+        var logs = resp.data || [];
+        totalPages = Math.max(1, Math.ceil((resp.total || 0) / pageSize));
+        currentPage = page;
+        document.getElementById('totalPages').textContent = totalPages;
+        document.getElementById('pageInput').value = page;
+        document.getElementById('prevPage').disabled = page <= 1;
+        document.getElementById('nextPage').disabled = page >= totalPages;
+        var tbody = document.getElementById('auditBody');
+        if (!tbody) return;
+        if (logs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><p>暂无活动</p></td></tr>';
+            return;
+        }
+        tbody.innerHTML = '';
+        logs.forEach(function(a) {
+            var statusClass = 'badge-info';
+            if (a.action.indexOf('_succeeded') !== -1 || a.action.indexOf('_success') !== -1) statusClass = 'badge-success';
+            else if (a.action.indexOf('_failed') !== -1) statusClass = 'badge-danger';
+            tbody.innerHTML += '<tr><td>' + a.id + '</td><td><span class="badge ' + statusClass + '">' + escapeHtml(a.action) + '</span></td><td>' + escapeHtml(a.actor) + '</td><td>' + escapeHtml(a.target) + '</td><td>' + escapeHtml(a.detail) + '</td><td>' + localTime(a.created_at) + '</td></tr>';
+        });
+    }).catch(function(){});
+}
+
+function goToPage(page) {
+    if (page < 1) page = 1;
+    if (page > totalPages) page = totalPages;
+    if (page !== currentPage) loadAuditPage(page);
+}
+
+function loadStats() {
+    Promise.all([
+        apiFetch('/api/v1/devices/').then(function(r){return r.json();}),
+        apiFetch('/api/v1/releases/').then(function(r){return r.json();}),
+        apiFetch('/api/v1/deployments/').then(function(r){return r.json();})
+    ]).then(function(results) {
+        var devices = results[0] || [];
+        var releases = results[1] || [];
+        var deployments = results[2] || [];
+        document.getElementById('statDevices').textContent = devices.length;
+        document.getElementById('statReleases').textContent = releases.length;
+        document.getElementById('statOnline').textContent = devices.filter(function(d){return d.agent_online;}).length;
+        var terminal = {'SUCCEEDED':1,'FAILED':1,'ROLLED_BACK':1,'RECOVERY_REQUIRED':1,'CANCELLED':1};
+        document.getElementById('statDeployments').textContent = deployments.filter(function(d){return !terminal[d.status];}).length;
+        loadAuditPage(1);
+    }).catch(function() {});
+}
+function escapeHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+loadStats();
+</script>
+{% endblock %}

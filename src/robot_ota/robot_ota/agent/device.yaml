@@ -1,0 +1,8 @@
+# 设备身份配置（随设备固定，不随版本升级改变）
+# 需与 OTA Server 上注册的信息一致。
+# 安装完成后请务必修改以下三个值。
+
+device_id: "robot-001"                    # 设备唯一标识，需和 Server 注册的 ID 一致
+device_token: "CHANGE_ME_GENERATE_STRONG_TOKEN"   # 设备 Token，Server 注册后返回的明文 Token
+server_url: "http://ota-server:8000"      # OTA Server 地址
+agent_root: "~/.zl_robot"              # Agent 安装根目录

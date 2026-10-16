@@ -1,0 +1,51 @@
+# 机器人关节与硬件映射示例配置。
+# 当前数据为工程初始化示例，不对应真实硬件；接入真实机器人前必须按硬件表校准。
+robot_joints:
+  # 关节分组用于控制器选择、状态聚合和安全策略。
+  groups:
+    head:        {description: "头部关节组"}
+    left_arm:    {description: "左臂关节组"}
+    right_arm:   {description: "右臂关节组"}
+    waist:       {description: "腰部关节组"}
+    left_leg:    {description: "左腿关节组"}
+    right_leg:   {description: "右腿关节组"}
+
+  # 每个关节必须有稳定唯一的 name。motor_id/slave_id/passage 为示例硬件映射。
+  joints:
+    # 头部
+    - {name: head_yaw, group: head, enable_default: false, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: head_pitch, group: head, enable_default: false, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    # 左臂
+    - {name: left_shoulder_pitch, group: left_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: left_shoulder_roll, group: left_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: left_shoulder_yaw, group: left_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: left_elbow, group: left_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: left_wrist_yaw, group: left_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: left_wrist_pitch, group: left_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: left_wrist_roll, group: left_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    # 右臂
+    - {name: right_shoulder_pitch, group: right_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: right_shoulder_roll, group: right_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: right_shoulder_yaw, group: right_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: right_elbow, group: right_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: right_wrist_yaw, group: right_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: right_wrist_pitch, group: right_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: right_wrist_roll, group: right_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    # 腰部
+    - {name: waist_pitch, group: waist, enable_default: false, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: waist_roll, group: waist, enable_default: false, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: waist_yaw, group: waist, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    # 左腿
+    - {name: left_hip_pitch, group: left_leg, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: left_hip_roll, group: left_leg, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: left_hip_yaw, group: left_leg, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: left_knee, group: left_leg, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: left_ankle_pitch, group: left_leg, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: left_ankle_roll, group: left_leg, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    # 右腿
+    - {name: right_hip_pitch, group: right_leg, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: right_hip_roll, group: right_leg, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: right_hip_yaw, group: right_leg, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: right_knee, group: right_leg, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: right_ankle_pitch, group: right_leg, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: right_ankle_roll, group: right_leg, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}

@@ -1,0 +1,11 @@
+# Tienkung 配置命令：把指定关节当前位置设置为电机内部零点。
+# timeout_sec <= 0 时由 robot_driver 使用默认超时时间。
+string joint_name
+float32 timeout_sec
+---
+# feedback_code 为厂家设置零点反馈码。
+bool success
+string message
+uint16 motor_id
+uint8 feedback_code
+float64 zero_position_rad

@@ -1,0 +1,28 @@
+robot_mqtt:
+  ros__parameters:
+    # MQTT broker 基础配置。
+    mqtt_broker: "127.0.0.1"
+    # mqtt_broker: "192.168.6.210"
+    mqtt_port: 1883
+    mqtt_client_id: "robot_mqtt"
+    mqtt_qos: 1
+
+    # ROS -> MQTT：核心状态上报。
+    ros_to_mqtt:
+      - ros_topic: "monitor/system_status"
+        type: "robot_interfaces/msg/SystemStatus"
+        mqtt_topic: "/mqtt/robot/monitor/system_status"
+
+      - ros_topic: "state"
+        type: "robot_interfaces/msg/RobotState"
+        mqtt_topic: "/mqtt/robot/state"
+
+      - ros_topic: "driver/status"
+        type: "robot_interfaces/msg/DriverStatus"
+        mqtt_topic: "/mqtt/robot/driver/status"
+
+    # MQTT -> ROS：云端/外部控制意图入口，统一进入 command router 前的 RobotIntent topic。
+    mqtt_to_ros:
+      - mqtt_topic: "/mqtt/robot/intent"
+        type: "robot_interfaces/msg/RobotIntent"
+        ros_topic: "input/intent"

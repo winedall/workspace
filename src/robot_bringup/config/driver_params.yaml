@@ -1,0 +1,5 @@
+/**:
+  ros__parameters:
+    motor_fault_confirm_frames: 10 # 非零 motor_error 连续确认帧数，避免单帧毛刺触发告警
+    joint_state_pub_hz: 200.0      # 关节状态发布频率，单位 Hz（5 ms）
+    driver_status_pub_hz: 10.0     # 驱动诊断状态发布频率，单位 Hz

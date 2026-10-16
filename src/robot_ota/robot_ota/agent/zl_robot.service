@@ -1,0 +1,48 @@
+# ZL Robot 控制系统的 systemd 服务。
+#
+# 模板文件：__AGENT_ROOT__ 和 __USER__ 在安装时由 install.sh 替换。
+#
+# 管理：
+#   sudo systemctl start zl_robot      # 启动
+#   sudo systemctl stop zl_robot       # 停止
+#   sudo systemctl restart zl_robot    # 重启
+#   sudo systemctl status zl_robot     # 查看状态
+#   journalctl -u zl_robot -f          # 查看实时日志
+
+[Unit]
+Description=ZL Robot Control System
+Documentation=https://github.com/anomalyco/zl_robot
+After=network.target
+Wants=network.target
+
+[Service]
+Type=exec
+
+# 运行用户
+User=__USER__
+Group=__USER__
+
+# 工作目录
+WorkingDirectory=__AGENT_ROOT__/current
+
+# 启动脚本
+ExecStart=__AGENT_ROOT__/current/scripts/run.sh
+
+# 停止信号：先 SIGTERM（15），10 秒后 SIGKILL
+TimeoutStopSec=10
+KillMode=mixed
+
+# 日志输出
+StandardOutput=journal
+StandardError=journal
+
+# 自动重启
+Restart=on-failure
+RestartSec=5
+
+# 资源限制（防止单节点异常拖垮系统）
+LimitNOFILE=65536
+LimitNPROC=16384
+
+[Install]
+WantedBy=multi-user.target

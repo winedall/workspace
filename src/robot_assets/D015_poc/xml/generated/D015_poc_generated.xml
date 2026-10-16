@@ -1,0 +1,116 @@
+<mujoco model="D015_poc">
+  <compiler angle="radian"/>
+  <option cone="pyramidal" impratio="5" gravity="0 0 -9.81"/>
+  <size njmax="500" nconmax="1000"/>
+  <default>
+    <joint damping="0.05" armature="0.01" frictionloss="0.1"/>
+  </default>
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" width="25" height="25" rgb1="0.9 0.95 1" rgb2="0.4 0.6 1" mark="none" markrgb="0 0 0"/>
+    <material name="groundmat" texture="grid" reflectance="0.1" texrepeat="50 50"/>
+  </asset>
+  <worldbody>
+    <body name="torso_link" pos="0 0 0.35">
+      <joint type="free"/>
+      <inertial pos="0.021112 0 -0.005366" mass="6.984" fullinertia="0.024909 0.121443 0.128701 -0.001295 0.000904 -6.7e-05"/>
+      <site name="imu" size="0.001" pos="-0.02557 0 0.04232"/>
+      <geom size="0.1881 0.04675 0.057" type="box" rgba="0.913725 0.913725 0.847059 1"/>
+      <geom size="0.05 0.045" pos="0.285 0 0.01" type="cylinder"/>
+      <geom size="0.047" pos="0.293 0 -0.06"/>
+      <body name="left_front_hip_roll_link" pos="0.1934 0.0465 0">
+        <inertial pos="-0.0054 0.00194 -0.000105" quat="0.488404 0.492979 0.509679 0.508587" mass="0.7783" diaginertia="0.00114775 0.000736999 0.000602254"/>
+        <joint name="left_front_hip_roll" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472" actuatorfrcrange="-23.7 23.7"/>
+        <geom size="0.046 0.02" pos="0 0.08 0" quat="0.707107 0.707107 0 0" type="cylinder" rgba="0.913725 0.913725 0.847059 1"/>
+        <body name="left_front_hip_pitch_link" pos="0 0.0955 0">
+          <inertial pos="-0.00374 -0.0223 -0.0327" quat="0.85699 0.0543931 -0.0671154 0.508041" mass="1.1845" diaginertia="0.00590966 0.00561554 0.000901804"/>
+          <joint name="left_front_hip_pitch" pos="0 0 0" axis="0 1 0" range="-1.5708 3.4907" actuatorfrcrange="-23.7 23.7"/>
+          <geom size="0.055 0.01225 0.017" pos="0 0 -0.1065" quat="0.707107 0 0.707107 0" type="box" rgba="0.913725 0.913725 0.847059 1"/>
+          <body name="left_front_knee_link" pos="0 0 -0.213">
+            <inertial pos="0.00602116 -0.00074096 -0.132521" quat="0.762244 0.0113313 0.0122284 0.647075" mass="0.363904" diaginertia="0.00146529 0.00144539 6.27903e-05"/>
+            <joint name="left_front_knee" pos="0 0 0" axis="0 1 0" range="-2.7227 -0.83776" actuatorfrcrange="-35.55 35.55"/>
+            <geom size="0.012 0.06" pos="0.008 0 -0.06" quat="0.994493 0 -0.104807 0" type="cylinder" rgba="0.913725 0.913725 0.847059 1"/>
+            <geom size="0.011 0.0325" pos="0.02 0 -0.148" quat="0.999688 0 0.0249974 0" type="cylinder"/>
+            <geom size="0.0155 0.015" pos="0.00801333 0 -0.18745" quat="0.965093 0 0.261909 0" type="cylinder"/>
+            <geom size="0.022" pos="-0.002 0 -0.213" rgba="0 0 0 1"/>
+          </body>
+        </body>
+      </body>
+      <body name="right_front_hip_roll_link" pos="0.1934 -0.0465 0">
+        <inertial pos="-0.0054 -0.00194 -0.000105" quat="0.508587 0.509679 0.492979 0.488404" mass="0.7783" diaginertia="0.00114775 0.000736999 0.000602254"/>
+        <joint name="right_front_hip_roll" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472" actuatorfrcrange="-23.7 23.7"/>
+        <geom size="0.046 0.02" pos="0 -0.08 0" quat="0.707107 0.707107 0 0" type="cylinder" rgba="0.913725 0.913725 0.847059 1"/>
+        <body name="right_front_hip_pitch_link" pos="0 -0.0955 0">
+          <inertial pos="-0.00374 0.0223 -0.0327" quat="0.508041 -0.0671154 0.0543931 0.85699" mass="1.1845" diaginertia="0.00590966 0.00561554 0.000901804"/>
+          <joint name="right_front_hip_pitch" pos="0 0 0" axis="0 1 0" range="-1.5708 3.4907" actuatorfrcrange="-23.7 23.7"/>
+          <geom size="0.055 0.01225 0.017" pos="0 0 -0.1065" quat="0.707107 0 0.707107 0" type="box" rgba="0.913725 0.913725 0.847059 1"/>
+          <body name="right_front_knee_link" pos="0 0 -0.213">
+            <inertial pos="0.00602116 0.00074096 -0.132521" quat="0.647075 0.0122284 0.0113313 0.762244" mass="0.363904" diaginertia="0.00146529 0.00144539 6.27903e-05"/>
+            <joint name="right_front_knee" pos="0 0 0" axis="0 1 0" range="-2.7227 -0.83776" actuatorfrcrange="-35.55 35.55"/>
+            <geom size="0.013 0.06" pos="0.01 0 -0.06" quat="0.995004 0 -0.0998334 0" type="cylinder" rgba="0 0 0 1"/>
+            <geom size="0.011 0.0325" pos="0.02 0 -0.148" quat="0.999688 0 0.0249974 0" type="cylinder"/>
+            <geom size="0.0155 0.015" pos="0.00801333 0 -0.18745" quat="0.965093 0 0.261909 0" type="cylinder"/>
+            <geom size="0.022" pos="-0.002 0 -0.213" rgba="0 0 0 1"/>
+          </body>
+        </body>
+      </body>
+      <body name="left_rear_hip_roll_link" pos="-0.1934 0.0465 0">
+        <inertial pos="0.0054 0.00194 -0.000105" quat="0.488404 0.492979 0.509679 0.508587" mass="0.7783" diaginertia="0.00114775 0.000736999 0.000602254"/>
+        <joint name="left_rear_hip_roll" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472" actuatorfrcrange="-23.7 23.7"/>
+        <geom size="0.046 0.02" pos="0 0.08 0" quat="0.707107 0.707107 0 0" type="cylinder" rgba="0.913725 0.913725 0.847059 1"/>
+        <body name="left_rear_hip_pitch_link" pos="0 0.0955 0">
+          <inertial pos="-0.00374 -0.0223 -0.0327" quat="0.85699 0.0543931 -0.0671154 0.508041" mass="1.1845" diaginertia="0.00590966 0.00561554 0.000901804"/>
+          <joint name="left_rear_hip_pitch" pos="0 0 0" axis="0 1 0" range="-0.5236 4.5379" actuatorfrcrange="-23.7 23.7"/>
+          <geom size="0.055 0.01225 0.017" pos="0 0 -0.1065" quat="0.707107 0 0.707107 0" type="box" rgba="0.913725 0.913725 0.847059 1"/>
+          <body name="left_rear_knee_link" pos="0 0 -0.213">
+            <inertial pos="0.00602116 -0.00074096 -0.132521" quat="0.762244 0.0113313 0.0122284 0.647075" mass="0.363904" diaginertia="0.00146529 0.00144539 6.27903e-05"/>
+            <joint name="left_rear_knee" pos="0 0 0" axis="0 1 0" range="-2.7227 -0.83776" actuatorfrcrange="-35.55 35.55"/>
+            <geom size="0.013 0.06" pos="0.01 0 -0.06" quat="0.995004 0 -0.0998334 0" type="cylinder" rgba="0 0 0 1"/>
+            <geom size="0.011 0.0325" pos="0.02 0 -0.148" quat="0.999688 0 0.0249974 0" type="cylinder"/>
+            <geom size="0.0155 0.015" pos="0.00801333 0 -0.18745" quat="0.965093 0 0.261909 0" type="cylinder"/>
+            <geom size="0.022" pos="-0.002 0 -0.213" rgba="0 0 0 1"/>
+          </body>
+        </body>
+      </body>
+      <body name="right_rear_hip_roll_link" pos="-0.1934 -0.0465 0">
+        <inertial pos="0.0054 -0.00194 -0.000105" quat="0.508587 0.509679 0.492979 0.488404" mass="0.7783" diaginertia="0.00114775 0.000736999 0.000602254"/>
+        <joint name="right_rear_hip_roll" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472" actuatorfrcrange="-23.7 23.7"/>
+        <geom size="0.046 0.02" pos="0 -0.08 0" quat="0.707107 0.707107 0 0" type="cylinder" rgba="0.913725 0.913725 0.847059 1"/>
+        <body name="right_rear_hip_pitch_link" pos="0 -0.0955 0">
+          <inertial pos="-0.00374 0.0223 -0.0327" quat="0.508041 -0.0671154 0.0543931 0.85699" mass="1.1845" diaginertia="0.00590966 0.00561554 0.000901804"/>
+          <joint name="right_rear_hip_pitch" pos="0 0 0" axis="0 1 0" range="-0.5236 4.5379" actuatorfrcrange="-23.7 23.7"/>
+          <geom size="0.055 0.01225 0.017" pos="0 0 -0.1065" quat="0.707107 0 0.707107 0" type="box" rgba="0.913725 0.913725 0.847059 1"/>
+          <body name="right_rear_knee_link" pos="0 0 -0.213">
+            <inertial pos="0.00602116 0.00074096 -0.132521" quat="0.647075 0.0122284 0.0113313 0.762244" mass="0.363904" diaginertia="0.00146529 0.00144539 6.27903e-05"/>
+            <joint name="right_rear_knee" pos="0 0 0" axis="0 1 0" range="-2.7227 -0.83776" actuatorfrcrange="-35.55 35.55"/>
+            <geom size="0.013 0.06" pos="0.01 0 -0.06" quat="0.995004 0 -0.0998334 0" type="cylinder" rgba="0 0 0 1"/>
+            <geom size="0.011 0.0325" pos="0.02 0 -0.148" quat="0.999688 0 0.0249974 0" type="cylinder"/>
+            <geom size="0.0155 0.015" pos="0.00801333 0 -0.18745" quat="0.965093 0 0.261909 0" type="cylinder"/>
+            <geom size="0.022" pos="-0.002 0 -0.213" rgba="0 0 0 1"/>
+          </body>
+        </body>
+      </body>
+    </body>
+    <light name="global_light" pos="0 0 5" dir="-0.2 -0.2 -1" diffuse="1 1 1" specular="0.2 0.2 0.2" directional="true"/>
+    <geom name="ground" type="plane" pos="0 0 0" size="50 50 0.1" material="groundmat" condim="1" rgba="1 1 1 1" contype="1" conaffinity="1" friction="1.0 0.05 0.005" solimp="0.9 0.95 0.001" solref="0.005 1"/>
+  </worldbody>
+  <actuator>
+    <motor name="left_front_hip_roll_motor" joint="left_front_hip_roll" ctrlrange="-23.7 23.7" ctrllimited="true"/>
+    <motor name="left_front_hip_pitch_motor" joint="left_front_hip_pitch" ctrlrange="-23.7 23.7" ctrllimited="true"/>
+    <motor name="left_front_knee_motor" joint="left_front_knee" ctrlrange="-35.55 35.55" ctrllimited="true"/>
+    <motor name="right_front_hip_roll_motor" joint="right_front_hip_roll" ctrlrange="-23.7 23.7" ctrllimited="true"/>
+    <motor name="right_front_hip_pitch_motor" joint="right_front_hip_pitch" ctrlrange="-23.7 23.7" ctrllimited="true"/>
+    <motor name="right_front_knee_motor" joint="right_front_knee" ctrlrange="-35.55 35.55" ctrllimited="true"/>
+    <motor name="left_rear_hip_roll_motor" joint="left_rear_hip_roll" ctrlrange="-23.7 23.7" ctrllimited="true"/>
+    <motor name="left_rear_hip_pitch_motor" joint="left_rear_hip_pitch" ctrlrange="-23.7 23.7" ctrllimited="true"/>
+    <motor name="left_rear_knee_motor" joint="left_rear_knee" ctrlrange="-35.55 35.55" ctrllimited="true"/>
+    <motor name="right_rear_hip_roll_motor" joint="right_rear_hip_roll" ctrlrange="-23.7 23.7" ctrllimited="true"/>
+    <motor name="right_rear_hip_pitch_motor" joint="right_rear_hip_pitch" ctrlrange="-23.7 23.7" ctrllimited="true"/>
+    <motor name="right_rear_knee_motor" joint="right_rear_knee" ctrlrange="-35.55 35.55" ctrllimited="true"/>
+  </actuator>
+  <sensor>
+    <gyro name="base_ang_vel" site="imu" noise="0.005" cutoff="34.9"/>
+    <framequat name="base_rotation" objtype="site" objname="imu" noise="0.001"/>
+    <accelerometer name="base_acc" site="imu" noise="0.005"/>
+  </sensor>
+</mujoco>
+

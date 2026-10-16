@@ -1,0 +1,40 @@
+# encos hardware 硬件配置模板。
+# 字段说明：
+#   vendor_type   - 厂商类型，当前为 encos
+#   bus_type      - 总线类型，当前为 ethercat
+#   ethercat      - EtherCAT 总线配置；network_interface 在真实硬件模式下需要配置为实际网卡
+#   name          - 关节名称，与 robot_joints.yaml 中的关节名对应
+#   motor_id      - 电机编号
+#   direction     - 电机旋转方向，+1 正转 / -1 反转
+#   offset        - 零位偏移量，单位度（关节空间）
+#   ratio         - 减速比，关节位置/速度/力矩到电机物理空间的缩放系数，默认 1.0
+# Encos/EtherCAT 可选字段：
+#   slave_id      - 从站编号（EtherCAT 总线地址）
+#   passage       - 通道号
+#   kt            - 力矩系数，Nm/A
+#   kp_min/kp_max/kd_min/kd_max/pos_min/pos_max/spd_min/spd_max/tor_min/tor_max/cur_min/cur_max
+#                - Encos 协议编码范围，按关节平铺配置
+hardware:
+  vendor_type: encos
+  bus_type: ethercat
+  ethercat:
+    network_interface: "enp1s0f3"
+    cycle_time_ms: 1.0
+    slave_count: 2
+  joints:
+    # 左前腿
+    - {name: FL_hip_joint,   motor_id: 11, slave_id: 0, passage: 1, direction: +1, offset: -57.8, ratio: 1.0, kt: 1.4, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -12.0, tor_max: 12.0, cur_min: -10.0, cur_max: 10.0}
+    - {name: FL_thigh_joint, motor_id: 12, slave_id: 0, passage: 2, direction: +1, offset: +99.7, ratio: 1.0, kt: 1.4, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -12.0, tor_max: 12.0, cur_min: -10.0, cur_max: 10.0}
+    - {name: FL_calf_joint,  motor_id: 13, slave_id: 0, passage: 3, direction: -1, offset: -59.6, ratio: 1.5, kt: 1.4, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -12.0, tor_max: 12.0, cur_min: -10.0, cur_max: 10.0}
+    # 右前腿
+    - {name: FR_hip_joint,   motor_id: 21, slave_id: 0, passage: 4, direction: +1, offset: +57.8, ratio: 1.0, kt: 1.4, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -30.0, tor_max: 30.0, cur_min: -30.0, cur_max: 30.0}
+    - {name: FR_thigh_joint, motor_id: 22, slave_id: 0, passage: 5, direction: -1, offset: -99.7, ratio: 1.0, kt: 1.4, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -30.0, tor_max: 30.0, cur_min: -30.0, cur_max: 30.0}
+    - {name: FR_calf_joint,  motor_id: 23, slave_id: 0, passage: 6, direction: +1, offset: +59.6, ratio: 1.5, kt: 1.4, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -30.0, tor_max: 30.0, cur_min: -30.0, cur_max: 30.0}
+    # 左后腿
+    - {name: RL_hip_joint,   motor_id: 31, slave_id: 1, passage: 1, direction: -1, offset: +57.8, ratio: 1.0, kt: 1.4, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -30.0, tor_max: 30.0, cur_min: -30.0, cur_max: 30.0}
+    - {name: RL_thigh_joint, motor_id: 32, slave_id: 1, passage: 2, direction: +1, offset: +99.7, ratio: 1.0, kt: 1.4, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -30.0, tor_max: 30.0, cur_min: -30.0, cur_max: 30.0}
+    - {name: RL_calf_joint,  motor_id: 33, slave_id: 1, passage: 3, direction: -1, offset: -59.6, ratio: 1.5, kt: 1.4, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -30.0, tor_max: 30.0, cur_min: -30.0, cur_max: 30.0}
+    # 右后腿
+    - {name: RR_hip_joint,   motor_id: 41, slave_id: 1, passage: 4, direction: -1, offset: -57.8, ratio: 1.0, kt: 1.4, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -30.0, tor_max: 30.0, cur_min: -30.0, cur_max: 30.0}
+    - {name: RR_thigh_joint, motor_id: 42, slave_id: 1, passage: 5, direction: -1, offset: -99.7, ratio: 1.0, kt: 1.4, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -30.0, tor_max: 30.0, cur_min: -30.0, cur_max: 30.0}
+    - {name: RR_calf_joint,  motor_id: 43, slave_id: 1, passage: 6, direction: +1, offset: +59.6, ratio: 1.5, kt: 2.74, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -120.0, tor_max: 120.0, cur_min: -60.0, cur_max: 60.0}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}审计日志{% endblock %}
+{% block heading %}审计日志{% endblock %}
+{% block content %}
+<div class="card">
+<table><thead><tr><th>ID</th><th>操作</th><th>操作者</th><th>目标</th><th>详情</th><th>IP</th><th>时间</th></tr></thead><tbody id="auditBody"></tbody></table>
+</div>
+<script>
+function loadAudit() {
+    loadTable('/api/v1/audit/', 'auditBody');
+}
+function renderRow(tr, a) {
+    tr.innerHTML = '<td>' + a.id + '</td>' +
+        '<td><span class="badge badge-info">' + escapeHtml(a.action) + '</span></td>' +
+        '<td>' + escapeHtml(a.actor) + '</td>' +
+        '<td>' + escapeHtml(a.target) + '</td>' +
+        '<td>' + escapeHtml(a.detail) + '</td>' +
+        '<td><code>' + escapeHtml(a.ip_address) + '</code></td>' +
+        '<td>' + localTime(a.created_at) + '</td>';
+}
+loadAudit();
+</script>
+{% endblock %}

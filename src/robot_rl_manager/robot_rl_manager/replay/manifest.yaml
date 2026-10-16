@@ -1,0 +1,27 @@
+defaults:
+  target_platform: rk3588
+  baseline_backend: onnxruntime
+  rknn_backend: rknnlite
+  verify:
+    atol: 1.0e-4
+    rtol: 1.0e-4
+    max_abs: 5.0e-2
+    mean_abs: 1.0e-2
+    p95_abs: 3.0e-2
+
+models:
+  t4_heart:
+    verify:
+      atol: 1.0e-4
+      rtol: 1.0e-4
+      max_abs: 5.0e-2
+      mean_abs: 1.0e-2
+      p95_abs: 3.0e-2
+  t4_walk:
+    need_capture: true
+    verify:
+      atol: 1.0e-4
+      rtol: 2.0e-4
+      max_abs: 5.0e-2
+      mean_abs: 1.0e-2
+      p95_abs: 3.0e-2

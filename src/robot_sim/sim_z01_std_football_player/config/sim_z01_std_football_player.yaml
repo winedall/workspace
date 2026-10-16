@@ -1,0 +1,85 @@
+# sim_z01_std_football_player 仿真配置：话题发布频率与可调常量。
+# 由 launch 文件加载，覆盖 sim_common 基类中的默认参数值。
+# 顶层 key 必须与节点 FQN 一致：节点在 bringup（PushRosNamespace）与独立启动下都在
+# /robot 命名空间，而 params-file 的 key 只有全限定名才匹配 —— 裸节点名只在节点位于
+# 根命名空间时生效。用裸名会让整份配置被静默忽略（节点退回 declare_parameter 的默认值）。
+/robot/sim_z01_std_football_player:
+  ros__parameters:
+    state_publish_period_us: 5000       # JointStates/IMU 发布节拍（200 Hz）
+    driver_status_period_ms: 200        # DriverStatus 发布周期（5 Hz）
+    camera_period_us: 33333            # 深度相机发布周期；0 = 关闭
+    base_z: 1.0                       # 初始基座高度 (m)
+    camera_distance: 3.0                  # 跟踪相机距离
+    camera_azimuth: 145.0
+    camera_elevation: -20.0
+    camera_index: 1                     # 初始窗口相机：0=自由 1=跟踪基座(默认) >=2=第 (index-2) 个固定相机
+
+    # ---- 窗口/界面显示（viewer）：只影响 MuJoCo 窗口，不影响物理与任何话题 ----
+    viewer:
+      ui0_enable: false      # 左侧面板（File/Option/Simulation/Watch/Physics）；本地调试可置 true
+      ui1_enable: false      # 右侧关节/执行器滑块面板（关节或执行器数 >100 时本来也不建）
+      spacing: 0             # UI 密度：0=Tight 1=Wide
+      color: 0               # 配色：0=Default 1=Orange 2=White 3=Black
+      font: -1               # 字体档 0..5（50%~300%）；-1 = 按屏幕 DPI 自动推断
+      help: false            # F1 帮助叠加层
+      info: false            # 左下信息（时间/尺寸/CPU/求解器/FPS/内存）
+      profiler: false        # 右上 CPU 时间曲线
+      sensor: false          # 右侧传感器曲线
+      vsync: true            # 垂直同步；关掉后渲染线程不受显示器刷新率节流
+      pause_update: true     # 暂停时仍刷新 profiler/sensor 曲线
+
+    # ---- 物理推进节奏（dynamics）：只影响物理线程，不改变模型本身 ----
+    dynamics:
+      start_paused: false    # true = 启动即暂停（先看初始姿态、等控制侧就绪）
+      busywait: false        # true = yield 忙等（步进更密、更贴近实时）；false = 睡 1ms（省 CPU）
+      refresh_rate: 60       # 每轮步进的时间预算 = 0.7/refresh_rate 秒
+      realtime_percent: 0.0  # 目标实时倍率(%)；0 = 用 XML 的 vis/global realtime
+
+    # ---- 未建模误差（errors）：传感器误差 + 执行延迟；seed=0 时整体关闭 ----
+    # 语义：仿真代替驱动器，用"带零位偏置的编码器"算 PD 力矩，所以稳态下关节真值会
+    # 偏位（真值 ≈ 指令 − 零位偏置），而对外发布的关节角等于指令值。
+    # 只影响传感器读数与执行时序，不改 mjModel 的物理参数（质量/质心/摩擦）。
+    errors:
+      seed: 0                          # 0 = 完全关闭（含全部时序参数），与不注入逐位一致；
+                                       # >0 = 固定种子，模型加载时抽一次常值误差，GUI Reload 后仍是同一台"个体"
+      # ---- 关节测量（编码器）----
+      joint_zero_offset_std_rad: 0.0   # 每关节零位常值偏置 σ(rad)，加载时抽一次
+      joint_pos_noise_std_rad: 0.0     # 关节位置白噪声 σ(rad)，每个仿真步抽一次
+      joint_vel_noise_std_rad_s: 0.0   # 关节速度白噪声 σ(rad/s)
+      # 回路影响：PD 力矩噪声 ≈ kp × joint_pos_noise_std_rad（腰部 kp=1000 时 1e-4 rad → 0.1 N·m）
+      # joint_zero_offset_rad: [0.0, ...]  # 可选：按关节显式给零位偏置（长度=关节数），给了就覆盖上面的 σ
+      # ---- IMU ----
+      mount_std_deg: 0.0               # IMU 安装角误差 σ(deg)，三轴独立；姿态/陀螺/加计同时受影响
+      gyro_bias_std_rad_s: 0.0         # 陀螺常值零偏 σ(rad/s)
+      gyro_noise_std_rad_s: 0.0        # 陀螺白噪声 σ(rad/s)
+      acc_bias_std_m_s2: 0.0           # 加计常值零偏 σ(m/s^2)
+      acc_noise_std_m_s2: 0.0          # 加计白噪声 σ(m/s^2)
+      att_bias_std_deg: 0.0            # AHRS 姿态常值误差 σ(deg)，只作用于姿态，不动陀螺/加计
+      att_noise_std_deg: 0.0           # AHRS 姿态白噪声 σ(deg)
+      # ---- 时序（力矩延迟：回路内）----
+      torque_delay_ms: 0.0             # 力矩延迟(ms)：把 N ms 前算出的力矩施加到当前步。
+                                       # **落在回路内**：阻尼项 kd·q̇ 会被一起延迟（延迟阻尼），
+                                       # 直接消耗相位裕度 —— 亚毫秒~几毫秒才安全，几十毫秒必然发散。
+                                       # 取整到最近的仿真步（dt=2ms 时配 1ms 实际生效 2ms），启动日志打印实际值
+      # ---- 时序（指令延迟：参考路径）----
+      command_delay_ms: 0.0            # 指令延迟(ms)：把整份指令帧（目标位置/速度/前馈/增益）延后 N ms，
+                                       # PD 仍用当前 q/dq 算 —— 与真机一致：驱动器收到的是 N ms 之前的目标，
+                                       # 但用它本地的编码器闭合 PD。延迟在**回路外**，只让跟踪滞后、
+                                       # 不吃相位裕度，所以可以给到几十毫秒。
+                                       # 实测"指令发布 → 力矩体现"：32 / 16 / 10 / 8 ms（四次实机录制），
+                                       # 这项才是补实测延迟的地方，不是 torque_delay_ms。
+                                       # 按仿真时间索引，不取整到仿真步
+      drop_probability: 0.0            # 每个仿真步丢弃新力矩的概率[0,1)：丢帧 = 驱动器保持上一帧
+      # ---- 时序（反馈上行）----
+      # 真机上驱动以固定节拍发 JointStates，但底层电机快照刷新得更慢（2026-09-23 实测
+      # 四次录制为 86.8 / 151.5 / 197.2 / 199.4 Hz，而发布固定 200 Hz），表现为整帧数值
+      # 逐位重复：实测 56.6% 的帧与前一行完全相同，且 pos/vel/tor 同帧变化（相邻两拍就变的
+      # 占比 0.0%）。这两项复现该现象，**只改发布出去的快照，不碰仿真内部的 PD 回路**。
+      feedback_hold_ms: 0.0            # 反馈采样保持周期(ms)。0 = 每次发布都刷新（与改造前一致）；
+                                       # 实测对照：11.52ms→86.8Hz  6.60→151.5  5.07→197.2  5.02→199.4
+                                       # 注意：必须大于 state_publish_period_us（默认 5ms），
+                                       # 否则每拍都刷新、保持不生效（运行时会打印一次 WARN）。
+                                       # 采样保持本身已隐含 hold/2 的平均滞后（11.5ms → +5.8ms）
+      feedback_delay_ms: 0.0           # 反馈链路纯延迟(ms)，与 torque_delay_ms 同量级。
+                                       # 与 feedback_hold_ms 会部分重复计数：标定观测滞后时
+                                       # **只用其中一个**，不要拿 hold 和 delay 各拟一次。

@@ -1,0 +1,6 @@
+# udev/99-robot-usb.rules
+
+SUBSYSTEM=="tty", ATTRS{idVendor}=="5953", ATTRS{idProduct}=="5543", SYMLINK+="robot_imu"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5740", SYMLINK+="robot_battery"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="g12_sbus"
+

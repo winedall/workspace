@@ -1,0 +1,31 @@
+# 机器人关节与硬件映射示例配置。
+# 当前数据为工程初始化示例，不对应真实硬件；接入真实机器人前必须按硬件表校准。
+robot_joints:
+  # 关节分组用于控制器选择、状态聚合和安全策略。
+  groups:
+    front_left:  {description: "左前腿"}
+    front_right: {description: "右前腿"}
+    rear_left:   {description: "左后腿"}
+    rear_right:  {description: "右后腿"}
+
+  # 每个关节必须有稳定唯一的 name。motor_id/slave_id/passage 为示例硬件映射。
+  joints:
+    # 左前腿
+    - {name: FL_hip_joint, group: front_left, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: FL_thigh_joint, group: front_left, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: FL_calf_joint, group: front_left, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    # 右前腿
+    - {name: FR_hip_joint, group: front_right, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: FR_thigh_joint, group: front_right, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: FR_calf_joint, group: front_right, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    # 左后腿
+    - {name: RL_hip_joint, group: rear_left, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: RL_thigh_joint, group: rear_left, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: RL_calf_joint, group: rear_left, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    # 右后腿
+    - {name: RR_hip_joint, group: rear_right, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: RR_thigh_joint, group: rear_right, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: RR_calf_joint, group: rear_right, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    
+    
+    

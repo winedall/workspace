@@ -1,0 +1,18 @@
+/**:
+  ros__parameters:
+    interpolation_steps: 30    # 插值步数（200Hz 下 100 帧 ≈ 0.5s）
+    states_topic: control/hardware_states  # 头部关节角来源（200 Hz）
+    imu_topic: imu/nav_all                # 基座姿态四元数来源（NavAll, quat 顺序 w,x,y,z）
+    use_base_attitude: true               # false=忽略 IMU，退回纯关节角+常数高度旧行为
+    pose_topic: head_pose                 # 输出位姿话题（/robot/head_pose）
+    head_pitch_joint: head_pitch          # 头部俯仰关节名
+    head_yaw_joint: head_yaw              # 头部偏航关节名
+    # --- 安装链几何常数（单位 m），默认取自 MuJoCo XML ---
+    # Z01_std_football_player/xml/Z01_std_football_player.xml 的头部关节链：
+    #   torso_link --head_pitch--> head_pitch_link  pos 0.00155 0 0.3155
+    #              --head_yaw-->   head_yaw_link    pos 0 0 0.0795
+    #              --fixed-->      depth_cam       pos 0.069 0.01 0.068
+    base_height: 0.83                             # 相机离地高度
+    head_pitch_offset: [0.00155, 0.0, 0.3155]     # torso_link -> head_pitch_link
+    head_yaw_offset: [0.0, 0.0, 0.0795]           # head_pitch_link -> head_yaw_link
+    camera_offset: [0.069, 0.01, 0.068]           # head_yaw_link -> depth_cam

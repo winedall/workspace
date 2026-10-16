@@ -1,0 +1,26 @@
+model:
+  name: d4_getup
+  control_frequency_hz: 50
+  observation_dim: 45
+  action_dim: 12
+  ankle_in_series: true
+
+joint_profiles:
+  run:
+    joints:
+      # FL
+      - {joint_name: FL_hip_joint, position: 0.0, kp: 50.0, kd: 5.0}
+      - {joint_name: FL_thigh_joint, position: 0.8, kp: 50.0, kd: 5.0}
+      - {joint_name: FL_calf_joint, position: -1.5, kp: 50.0, kd: 5.0}
+      # FR
+      - {joint_name: FR_hip_joint, position: 0.0, kp: 50.0, kd: 5.0}
+      - {joint_name: FR_thigh_joint, position: 0.8, kp: 50.0, kd: 5.0}
+      - {joint_name: FR_calf_joint, position: -1.5, kp: 50.0, kd: 5.0}
+      # RL
+      - {joint_name: RL_hip_joint, position: 0.0, kp: 50.0, kd: 5.0}
+      - {joint_name: RL_thigh_joint, position: 0.8, kp: 50.0, kd: 5.0}
+      - {joint_name: RL_calf_joint, position: -1.5, kp: 50.0, kd: 5.0}
+      # RR
+      - {joint_name: RR_hip_joint, position: 0.0, kp: 50.0, kd: 5.0}
+      - {joint_name: RR_thigh_joint, position: 0.8, kp: 50.0, kd: 5.0}
+      - {joint_name: RR_calf_joint, position: -1.5, kp: 50.0, kd: 5.0}

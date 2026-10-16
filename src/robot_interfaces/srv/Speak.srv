@@ -1,0 +1,5 @@
+string text
+uint8 priority
+---
+bool success
+string message

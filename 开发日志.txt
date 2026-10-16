@@ -1,0 +1,727 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-06-07
+1、模型加载
+相对路径
+ros2 service call /robot/rl_manager/load_model robot_interfaces/srv/LoadRlModel "{model_name: heart, model_path: model/t4_heart_mjlab.onnx, model_type: onnx, config_path: config/heart.yaml, adapter_path: policy/adapters/heart.py}"
+
+绝对路径
+ros2 service call /robot/rl_manager/load_model robot_interfaces/srv/LoadRlModel "{model_name: heart, model_path: /home/zoomlion/work/00_temp/t4_heart_mjlab.onnx, model_type: onnx, config_path: /home/zoomlion/work/00_temp/heart.yaml, adapter_path: /home/zoomlion/work/00_temp/heart.py}"
+
+2、模型切换
+ros2 service call /robot/rl_manager/switch_model robot_interfaces/srv/SwitchRlModel "{model_name: stand}"
+
+ros2 service call /robot/rl_manager/switch_model robot_interfaces/srv/SwitchRlModel "{model_name: walk}"
+
+3、错误清除
+ros2 service call /robot/state/reset_fault robot_interfaces/srv/ResetFault "{reason: \'\'}"
+
+4、模型停止循环
+ros2 topic pub /robot/rl_manager/finish_loop std_msgs/Empty "{}" --once
+
+5、停止当前动作，切到 walk 零速站立
+ros2 topic pub /robot/rl_manager/motion_stop std_msgs/String "data: stop" --once
+
+6、恢复
+ros2 topic pub /robot/rl_manager/motion_stop std_msgs/String "data: resume" --once
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-06-11
+1、语音播报
+# 查看语音状态（话题）
+ros2 topic echo /robot/audio/status
+
+# 发送语音播报（话题）
+ros2 topic pub /robot/audio/voice_text robot_interfaces/msg/VoiceText "{text: '你好，我是机器人', priority: 100}" --once
+
+# 发送语音播报（服务）
+ros2 service call /robot/audio/speak robot_interfaces/srv/Speak "{text: '你好，我是机器人', priority: 100}"
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-06-19
+控制命令链路：
+
+  robot_teleop/API
+    -> /robot/input/intent
+    -> robot_router
+    -> /robot/router/active_intent
+    -> robot_rl_manager
+    -> /robot/rl_manager/desired_commands       200Hz
+    -> robot_router
+    -> /robot/router/accepted_commands
+    -> robot_control
+    -> /robot/control/hardware_commands
+    -> robot_driver
+    -> EtherCAT / backend
+
+  反馈与状态链路：
+
+  robot_driver
+    -> /robot/joint_states                            200Hz
+       -> robot_control
+       -> robot_rl_manager
+       -> robot_state_manager
+
+  robot_driver
+    -> /robot/driver/status                           10Hz
+       -> robot_router
+       -> robot_state_manager
+
+  robot_rl_manager
+    -> /robot/rl_manager/status                       1Hz
+       -> robot_state_manager
+
+  robot_state_manager
+    -> /robot/state                                   20Hz
+       -> robot_router
+       -> robot_control
+       -> robot_rl_manager
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-06-25
+# 1. 获取电机 ID
+ros2 service call /robot/driver/encos/get_motor_id robot_interfaces/srv/EncosGetMotorId "{slave_id: 0, passage: 1, timeout_sec: 1.0}"
+
+# 2. 设置电机 ID（将 motor_id 改为 new_motor_id）
+ros2 service call /robot/driver/encos/set_motor_id robot_interfaces/srv/EncosSetMotorId "{slave_id: 0, passage: 1, motor_id: 1, new_motor_id: 1, timeout_sec: 1.0}"
+
+# 3. 设置电机零点
+ros2 service call /robot/driver/encos/set_motor_zero robot_interfaces/srv/EncosSetMotorZero "{slave_id: 0, passage: 1, motor_id: 1, timeout_sec: 1.0}"
+
+# 4. 获取电机参数（param_code 为厂家协议参数编号）
+ros2 service call /robot/driver/encos/get_motor_param robot_interfaces/srv/EncosGetMotorParam "{slave_id: 0, passage: 1, motor_id: 1, param_code: 1, timeout_sec: 1.0}"
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-06-29
+1、启动程序
+sudo systemctl start zl_robot.service
+
+2、停止程序
+sudo systemctl stop zl_robot.service
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-07-01
+1、CPU压力测试
+# 安装
+sudo apt update && sudo apt install stress -y
+# 拉满所有 CPU 核心（持续运行）
+stress -c $(nproc)
+# 拉满并持续 60 秒
+stress -c $(nproc) -t 60
+
+2、机器人双网卡路由冲突的问题
+# 立即断开
+sudo nmcli device disconnect enxac0c29a39b6d
+# 禁止自动连接
+sudo nmcli connection modify "enxac0c29a39b6d" connection.autoconnect no
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-07-06
+一、RealSense环境安装
+1、安装Ros2依赖
+sudo apt-get install ros-humble-diagnostic-updater
+sudo apt-get install ros-humble-launch-pytest
+
+2、下载并导入 GPG 公钥
+curl -sSf https://librealsense.realsenseai.com/Debian/librealsenseai.asc | gpg --dearmor | sudo tee /etc/apt/keyrings/librealsenseai.gpg > /dev/null
+
+3、添加 apt 软件源
+echo "deb [signed-by=/etc/apt/keyrings/librealsenseai.gpg] https://librealsense.realsenseai.com/Debian/apt-repo `lsb_release -cs` main" | sudo tee /etc/apt/sources.list.d/librealsense.list
+
+4、更新包索引
+sudo apt update
+
+5、安装 DKMS 驱动
+sudo apt-get install librealsense2-dkms
+
+6、安装工具包
+sudo apt-get install librealsense2-utils
+
+7、安装开发包
+sudo apt-get install librealsense2-dev
+sudo apt-get install librealsense2-dbg
+
+二、RealSense源码下载
+https://github.com/realsenseai/realsense-ros
+
+三、RealSense测试
+1、查询设备的信息
+rs-enumerate-devices
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-07-09
+1、cyclonedds配置，复制配置文件
+将config/cyclonedds_localhost.xml复制到~/.config目录
+
+2、修改~/.bashrc，在文件末尾添加
+# 加载环境变量
+source /home/zl/.zl_robot/current/install/setup.bash
+
+# ROS 2 DDS config for zl_robot
+export ROS_LOCALHOST_ONLY=1
+export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+export CYCLONEDDS_URI=file:///home/zl/.config/cyclonedds_localhost.xml
+
+sudo apt install ros-humble-cyclonedds*
+sudo apt install ros-humble-rmw-cyclonedds-cpp
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-07-10
+一、OTA升级所需环境
+1、安装venv
+sudo apt install python3.10-venv
+
+2、安装uvicorn
+sudo pip3 install uvicorn
+
+3、安装fastapi
+sudo pip3 install fastapi
+
+4、安装pydantic-settings
+sudo pip3 install pydantic-settings
+
+5、安装python-multipart
+sudo pip3 install python-multipart
+
+6、安装jinja2
+sudo pip3 install jinja2
+
+7、安装aiofiles
+sudo pip3 install aiofiles
+
+8、安装sqlalchemy
+sudo pip3 install sqlalchemy
+
+9、安装alembic
+sudo pip3 install alembic
+
+10、安装paramiko
+sudo pip3 install paramiko
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-07-12
+一、安装docker
+1、清除ubuntu旧docker包
+sudo apt remove -y docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc
+
+2、安装docker
+sudo apt update
+sudo apt install -y ca-certificates curl
+
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+-o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+sudo tee /etc/apt/sources.list.d/docker.sources > /dev/null <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+3、验证docker
+sudo systemctl status docker
+sudo docker run hello-world
+
+4、把当前用户加入 docker 组
+sudo usermod -aG docker $USER
+
+二、使用docker镜像
+1、下载镜像
+sudo docker pull ros:humble
+
+2、查看镜像
+sudo docker image list
+
+3、删除镜像
+sudo docker image rm ros:humble
+sudo docker image rm zl_robot:v1.0
+
+
+三、使用docker容器
+1、启动容器
+原始镜像
+sudo docker run --rm -it --name zl_robot --network host ros:humble bash
+迭代镜像
+sudo docker run --rm -it --name zl_robot --network host zl_robot:v1.0 bash
+sudo docker run --rm -it --name zl_robot zl_robot:v1.0 bash
+
+2、停止容器
+sudo docker stop zl_robot
+
+3、查看容器
+docker container list -a
+
+4、删除容器
+docker container rm zl_robot
+
+5、生成迭代镜像
+sudo docker commit zl_robot zl_robot:v1.0
+
+6、迭代镜像添加标签
+docker tag zl_robot:v1.0 zl_robot:latest
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-07-14
+1、网络异常解决（临时）
+sudo ip link set ens33 up
+sudo dhclient ens33
+
+2、网络异常解决（永久）
+sudo nmcli networking off
+sudo nmcli networking on
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-07-15
+1、安装filezilla
+sudo apt-get install filezilla
+
+2、音量控制接口
+设置音量为 60%
+ros2 service call /robot/monitor/set_volume robot_interfaces/srv/SetVolume "{volume_percent: 60.0}"
+
+设置静音
+ros2 service call /robot/monitor/set_mute robot_interfaces/srv/SetMute "{muted: true}"
+
+取消静音，并恢复到 monitor 记住的期望音量
+ros2 service call /robot/monitor/set_mute robot_interfaces/srv/SetMute "{muted: false}"
+
+查看当前音量/静音状态：
+ros2 topic echo /robot/monitor/system_status
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-07-21
+1、头部控制
+ros2 topic pub --once /robot/external/head_control robot_interfaces/msg/HeadControl \
+  "{yaw: 0.0, pitch: 60.0, is_relative: false}"
+
+2、depth模型切换
+ros2 service call /robot/rl_manager/switch_model robot_interfaces/srv/SwitchRlModel \
+"{model_name: depth}"
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-07-28
+1、安装语音
+sudo apt install portaudio19-dev libportaudio2
+sudo pip3 install pyaudio
+sudo pip3 install grpcio grpcio-tools
+sudo apt install -y alsa-utils
+sudo pip3 install piper-tts
+
+sudo apt install portaudio19-dev
+pip install grpcio==1.75.1
+pip install protobuf==6.33.1
+pip install pyAudio==0.2.14
+pip install tritonclient==2.66.0
+pip install emoji
+pip install wetext
+pip install chardet==7.2.0
+
+sudo pip3 install playsound
+sudo pip3 install pyrealsense2
+sudo pip3 install mediapipe
+
+sudo python3 -m pip install sherpa-onnx
+
+2、优化连接NoMachine导致机器人外放禁用问题
+/usr/NX/etc/node.cfg 
+修改AudioInterface disabled 
+重启nomachine
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-08-06
+1、安装键盘控制
+sudo pip3 install pynput
+
+2、强化学习onnx的默认配置
+intra_op_num_threads = 0
+inter_op_num_threads = 0
+execution_mode = ORT_SEQUENTIAL
+
+3、安装mocap相关的包
+sudo apt install ros-humble-vrpn-mocap
+
+4、安装mink
+sudo pip3 install mink
+
+5、安装loop_rate_limiters
+sudo pip3 install loop_rate_limiters
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-08-08
+1、降低setuptools的版本
+sudo pip3 install setuptools==64
+
+2、降低numpy版本
+sudo pip3 install "numpy<2.0"
+
+3、安装指torch版本
+sudo pip3 install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 --index-url https://download.pytorch.org/whl/cpu
+
+4、安装domain-bridge
+sudo apt install ros-humble-domain-bridge
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-08-10
+一、虚拟机ubuntu22.04不能跟宿主的windows系统互相复制文件
+1、卸载可能冲突的官方 VMware Tools
+sudo vmware-uninstall-tools.pl
+sudo rm -rf /usr/lib/vmware-tools
+sudo apt-get autoremove --purge open-vm-tools -y
+
+2、安装 open-vm-tools
+sudo apt update
+sudo apt install -y open-vm-tools open-vm-tools-desktop
+
+3、禁用 Wayland（关键步骤）
+sudo vim /etc/gdm3/custom.conf
+找到 #WaylandEnable=false，删除开头的 #，保存并重启
+sudo reboot
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-08-10
+一、搭建MQTT局域网通信
+1、安装Mosquitto
+服务器：
+sudo apt-get install mosquitto mosquitto-clients
+Mosquitto 安装成功后，默认会作为系统服务运行。检查 Mosquitto 服务状态：
+sudo systemctl status mosquitto
+
+创建自定配置
+/etc/mosquitto/conf.d/default.conf
+
+添加如下内容（允许外部连接）：
+# 允许匿名连接（测试用）
+allow_anonymous true
+
+# 监听所有网络接口（默认只监听localhost）
+listener 1883 0.0.0.0
+
+# 也可以单独指定
+# listener 1883 192.168.6.131
+
+客户端：
+sudo apt-get install mosquitto-clients
+
+2、测试Mosquitto
+在一个终端运行订阅主题
+mosquitto_sub -h localhost -t "test/mqtt_topic"
+mosquitto_sub -h localhost -t "/mqtt/action_program"
+
+在另外一个终端运行发布消息
+mosquitto_pub -h localhost -t "/mqtt/action_program" -m "{\"action\": 1}"
+mosquitto_pub -h localhost -t "test/mqtt_topic" -m "Hello, MQTT"
+watch -n 1 'mosquitto_pub -h localhost -t "test/mqtt_topic" -m "Hello from watch $(date)"'
+
+3、安装 C++依赖
+sudo apt-get install libpaho-mqttpp-dev
+
+4、安装 Paho MQTT C 库
+# 安装依赖
+sudo apt-get install build-essential cmake libssl-dev git
+# 克隆 C 语言版本的 Paho 库
+git clone https://github.com/eclipse/paho.mqtt.c
+# 编译并安装
+cd paho.mqtt.c
+mkdir build && cd build
+cmake -DPAHO_BUILD_STATIC=OFF -DPAHO_BUILD_SHARED=ON -DPAHO_BUILD_DOCUMENTATION=OFF -DPAHO_WITH_SSL=ON ../
+make
+sudo make install
+# 头文件安装路径：/usr/local/include
+# 库文件安装路径：/usr/local/lib
+# 库文件：libpaho-mqtt3c.so libpaho-mqtt3a.so libpaho-mqtt3as.so
+
+5、安装 Paho MQTT C++ 库
+# 克隆 C++ 版本的 Paho 库
+git clone https://github.com/eclipse/paho.mqtt.cpp
+# 编译并安装
+cd paho.mqtt.cpp
+mkdir build && cd build
+cmake -DPAHO_BUILD_STATIC=OFF -DPAHO_BUILD_SHARED=ON -DPAHO_BUILD_DOCUMENTATION=OFF -DPAHO_WITH_SSL=ON ../
+make
+sudo make install
+# 头文件安装路径：/usr/local/include/mqtt
+# 库文件安装路径：/usr/local/lib
+
+6、安装paho-mqtt
+sudo pip install paho-mqtt
+
+7、查看MQTT客户端连接情况
+sudo netstat -tnp | grep mosquitto
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-08-10
+一、配置wifi
+1、查看网络连接状态
+nmcli device status
+
+2、查看wifi设备列表
+nmcli device wifi rescan
+nmcli device wifi list
+
+3、配置wifi连接
+sudo nmcli device wifi connect "TP-LINK_66FD" password "zlzk.1570"
+sudo nmcli device wifi connect "Etude" password "12345654321"
+
+4、确认网络连接状态
+nmcli device status
+
+二、配置虚拟界面
+1、安装xserver
+sudo apt install xserver-xorg-core-hwe-18.04
+sudo apt install xserver-xorg-video-dummy
+
+2、添加配置文件xorg.conf
+创建/usr/share/X11/xorg.conf.d/xorg.conf
+添加如下内容：
+Section "Monitor"
+  Identifier "Monitor0"
+  HorizSync 28.0-80.0
+  VertRefresh 48.0-75.0
+  # https://arachnoid.com/modelines/
+  # 1920x1080 @ 60.00 Hz (GTF) hsync: 67.08 kHz; pclk: 172.80 MHz
+  Modeline "1920x1080_60.00" 172.80 1920 2040 2248 2576 1080 1081 1084 1118 -HSync +Vsync
+EndSection
+Section "Device"
+  Identifier "Card0"
+  Driver "dummy"
+  VideoRam 256000
+EndSection
+Section "Screen"
+  DefaultDepth 24
+  Identifier "Screen0"
+  Device "Card0"
+  Monitor "Monitor0"
+  SubSection "Display"
+    Depth 24
+    Modes "1920x1080_60.00"
+  EndSubSection
+EndSection
+
+3、重启系统
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-08-10
+一、升级cmake
+1、安装依赖
+sudo apt update
+sudo apt install -y ca-certificates gpg wget
+
+2、添加 Kitware 签名密钥
+wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null
+
+3、添加仓库（Ubuntu 22.04 Jammy）
+echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ jammy main' | sudo tee /etc/apt/sources.list.d/kitware.list
+
+4、更新并安装
+sudo apt update
+sudo apt install -y cmake
+
+5、验证
+cmake --version  # 应显示 3.28+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-08-10
+一、设置wifi热点开机自启
+1、在/etc/rc.local文件中，添加
+nmcli c up Hotspot
+	
+2、为/etc/rc.local设置可执行权限
+sudo chmod +x /etc/rc.local
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-08-10
+一、强化学习环境配置
+1、创建虚拟环境
+python -m venv gym_env
+source gym_env/bin/activate
+pip install gym==0.25.2
+pip install pygame
+
+2、真实环境安装python3.9
+sudo apt install software-properties-common -y
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install python3.9 -y
+
+3、重新创建python3.9虚拟环境
+rm -rf gym_env
+python3.9 -m venv gym_env
+
+4、安装torch
+python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+5、安装pandas
+python -m pip install pandas
+
+6、安装yaml
+python -m pip install PyYAML
+
+7、安装lcm
+python -m pip install lcm 
+
+8、安装onnxruntime
+sudo pip3 install onnxruntime
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-08-13
+1、调试打印程序信息
+journalctl -u zl_robot.service -f
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-09-03
+一、设置本机的虚拟机通过 IP 转发实现路由功能
+1、虚拟机
+# 开启 Linux 内核的 IPv4 转发功能，使虚拟机可以作为路由器转发网络数据
+sudo sysctl -w net.ipv4.ip_forward=1
+
+# 允许来自网口 enx9c69d36fe1c1（连接 RK3588） 的数据通过 ens33 转发到外部网络
+sudo iptables -A FORWARD -i enx9c69d36fe1c1 -o ens33 -j ACCEPT
+
+# 允许外部网络通过 ens33 返回的已建立连接数据转发回 RK3588
+sudo iptables -A FORWARD -i ens33 -o enx9c69d36fe1c1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+# 对从 ens33 发出的数据进行 NAT 地址伪装，使 RK3588 可以借用虚拟机网络访问外网
+sudo iptables -t nat -A POSTROUTING -o ens33 -j MASQUERADE
+
+2、3588
+# 设置 DNS 服务器为 8.8.8.8，用于解析域名
+echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+
+# 将虚拟机 10.1.2.210 设置为 RK3588 的默认网关，使外网流量通过虚拟机转发
+sudo ip route add default via 10.1.2.210
+sudo ip route add default via 192.168.1.210
+sudo ip route add default via 192.168.12.210
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-09-09
+1、安装rknn模型转换的环境
+cd ~/work/99_robot/zl_robot
+
+python3 -m venv .venv-rknn --system-site-packages
+source .venv-rknn/bin/activate
+
+pip install rknn-toolkit2==2.3.2
+pip install numpy==1.26.4 onnx==1.22.0 onnxruntime==1.23.2 opencv-python==4.11.0.86 protobuf==4.25.4 psutil ruamel.yaml scipy
+torch tqdm fast-histogram flatbuffers PyYAML
+
+验证：
+
+python3 -c "from rknn.api import RKNN; print('RKNN OK')"
+python3 -m robot_rl_manager.convert --list
+
+# 镜像
+-i https://pypi.tuna.tsinghua.edu.cn/simple
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-09-14
+一、天工电机参数
+joints:
+    # 头部
+    - {name: head_yaw, motor_id: 1, direction: +1, offset: 0.0, N/A}
+    - {name: head_pitch, motor_id: 2, direction: +1, offset: 0.0, N/A}
+    # 左臂
+    - {name: left_shoulder_pitch, motor_id: 11, direction: +1, offset: -154.0, 操作员视角，逆时针转到限位}
+    - {name: left_shoulder_roll, motor_id: 12, direction: +1, offset: -129.0, 重力作用往下卡在限位}
+    - {name: left_shoulder_yaw, motor_id: 13, direction: -1, offset: -150.5, 操作员视角，逆时针转到限位}
+    - {name: left_elbow, motor_id: 14, direction: +1, offset: 121.0, 关节往内卡在限位}
+    - {name: left_wrist_yaw, motor_id: 15, direction: -1, offset: -150.5, 操作员视角，逆时针转到限位}
+    - {name: left_wrist_pitch, motor_id: 16, direction: +1, offset: -92.5, N/A}
+    - {name: left_wrist_roll, motor_id: 17, direction: +1, offset: 92.5, N/A}
+    # 右臂
+    - {name: right_shoulder_pitch, motor_id: 21, direction: -1, offset: 154.0, 操作员视角，顺时针转到限位}
+    - {name: right_shoulder_roll, motor_id: 22, direction: +1, offset: 129.0, 重力作用往下卡在限位}
+    - {name: right_shoulder_yaw, motor_id: 23, direction: -1, offset: 150.5, 操作员视角，顺时针转到限位}
+    - {name: right_elbow, motor_id: 24, direction: -1, offset: -121.0, 关节往内卡在限位}
+    - {name: right_wrist_yaw, motor_id: 25, direction: -1, offset: 150.5, 操作员视角，顺时针转动到限位}
+    - {name: right_wrist_pitch, motor_id: 26, direction: +1, offset: -92.5, N/A}
+    - {name: right_wrist_roll, motor_id: 27, direction: +1, offset: -92.5, N/A}
+    # 腰部
+    - {name: waist_pitch, motor_id: 31, direction: -1, offset: 0.0, N/A}
+    - {name: waist_roll, motor_id: 32, direction: -1, offset: 0.0, N/A}
+    - {name: waist_yaw, motor_id: 33, direction: -1, offset: 150.0, 垂直往下视角，双腿逆时针转到限位}
+    # 左腿
+    - {name: left_hip_pitch, motor_id: 41, direction: +1, offset: 165.0, 操作员视角，顺时针转到限位}
+    - {name: left_hip_roll, motor_id: 42, direction: +1, offset: -170.0, 重力作用往下卡在限位}
+    - {name: left_hip_yaw, motor_id: 43, direction: -1, offset: 158.0, 垂直往下视角，顺时针转到限位}
+    - {name: left_knee, motor_id: 44, direction: +1, offset: 5.0, 重力作用往下卡在限位}
+    - {name: left_ankle_pitch, motor_id: 45, direction: +1, offset: -65.2, 往上转到限位}
+    - {name: left_ankle_roll, motor_id: 46, direction: +1, offset: 65.1, 插销定位}
+    # 右腿
+    - {name: right_hip_pitch, motor_id: 51, direction: -1, offset: -165.0, 操作员视角，逆时针转到限位}
+    - {name: right_hip_roll, motor_id: 52, direction: +1, offset: 170.0, 重力作用往下卡在限位}
+    - {name: right_hip_yaw, motor_id: 53, direction: -1, offset: -158.0, 垂直往下视角，逆时针转到限位}
+    - {name: right_knee, motor_id: 54, direction: -1, offset: -5.0, 重力作用往下卡在限位}
+    - {name: right_ankle_pitch, motor_id: 55, direction: +1, offset: 65.2, 往上转到限位}
+    - {name: right_ankle_roll, motor_id: 56, direction: +1, offset: -65.1, 插销限位}
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-10-08
+1、安装robocup相关依赖
+sudo apt install ros-humble-behaviortree-cpp
+
+2、查看can的发送队列大小
+for i in 0 1 2 3; do echo -n "can$i: "; cat /sys/class/net/can$i/tx_queue_len; done
+
+3、查看robot_driver绑定的cpu核
+taskset -cp $(pgrep -f robot_driver)
+
+
+

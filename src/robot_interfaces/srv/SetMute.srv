@@ -1,0 +1,11 @@
+# true 表示静音，false 表示取消静音并恢复到期望音量。
+bool muted
+---
+# 是否设置成功。
+bool success
+# 成功或失败说明。
+string message
+# 设置后读取到的当前音量百分比，无法读取时为 -1。
+float32 current_volume_percent
+# 设置后读取到的当前静音状态。
+bool muted

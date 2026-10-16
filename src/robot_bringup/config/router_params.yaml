@@ -1,0 +1,8 @@
+/**:
+  ros__parameters:
+    teleop_priority: 0                          # 遥操作固定最高优先级，数值越小优先级越高
+    app_priority_min: 1                         # App 指令源最高优先级
+    app_priority_max: 49                        # App 指令源最低优先级
+    api_priority_min: 50                        # API/HTTP/MQTT/云端指令源最高优先级
+    api_priority_max: 99                        # API/HTTP/MQTT/云端指令源最低优先级
+    unknown_priority: 255                       # 未知来源固定最低优先级

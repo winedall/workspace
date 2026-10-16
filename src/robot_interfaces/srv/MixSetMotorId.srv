@@ -1,0 +1,11 @@
+# Mix CANFD 配置命令：按关节名修改电机 ID。
+string joint_name
+uint16 new_motor_id
+float32 timeout_sec
+---
+bool success
+string message
+string vendor
+uint16 motor_id
+uint16 new_motor_id
+uint8 feedback_code

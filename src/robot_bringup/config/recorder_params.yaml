@@ -1,0 +1,26 @@
+/**:
+  ros__parameters:
+    # CSV 输出目录（相对于工作目录或绝对路径）
+    output_dir: logs
+    # continuous 模式下环形缓冲区容量
+    buffer_capacity: 2000
+    # 写入线程刷新间隔（毫秒），控制批量写入频率
+    flush_interval_ms: 100.0
+    # 记录模式：event_window 仅在故障事件前后落盘；continuous 持续落盘
+    recording_mode: continuous
+    # event_window 模式下保留故障前窗口时长（秒）
+    pre_event_window_sec: 180.0
+    # event_window 模式下故障触发后继续记录时长（秒）
+    post_event_window_sec: 60.0
+    # 状态统计日志输出间隔（毫秒）
+    stats_interval_ms: 1000.0
+
+    # 记录开关
+    record_states: true
+    record_commands: true
+    record_desired: false
+    record_accepted: false
+    record_imu: true
+
+    # 故障事件冷却时间
+    event_cooldown_sec: 2.0

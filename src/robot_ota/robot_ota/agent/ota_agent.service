@@ -1,0 +1,20 @@
+[Unit]
+Description=ZL Robot OTA Upgrade Agent
+Documentation=https://github.com/anomalyco/zl_robot_ota
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+Environment=ZL_ROBOT_AGENT_ROOT=__AGENT_ROOT__
+ExecStart=__AGENT_ROOT__/ota_agent/venv/bin/python3 -m agent.main
+WorkingDirectory=__AGENT_ROOT__/ota_agent
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

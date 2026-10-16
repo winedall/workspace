@@ -1,0 +1,3 @@
+/**:
+  ros__parameters:
+    state_publish_frequency_hz: 20.0       # 机器人状态发布频率，单位 Hz

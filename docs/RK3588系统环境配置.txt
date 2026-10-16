@@ -1,0 +1,81 @@
+3588预装环境：
+1、调试有线ip：192.168.12.100
+2、安装ros2 humble
+3、安装cyclonedds
+sudo apt install ros-humble-cyclonedds*
+sudo apt install ros-humble-rmw-cyclonedds-cpp
+4、安装sherpa-onnx
+sudo python3 -m pip install sherpa-onnx
+5、安装rknnlite
+sudo python3 -m pip install rknn-toolkit-lite2
+7、安装onnxruntime
+sudo python3 -m pip install onnxruntime
+8、降低numpy版本
+sudo python3 -m pip install "numpy<2.0"
+
+一、RealSense环境安装
+1、安装Ros2依赖
+sudo apt-get install ros-humble-diagnostic-updater
+sudo apt-get install ros-humble-launch-pytest
+2、下载并导入 GPG 公钥
+curl -sSf https://librealsense.realsenseai.com/Debian/librealsenseai.asc | gpg --dearmor | sudo tee /etc/apt/keyrings/librealsenseai.gpg > /dev/null
+3、添加 apt 软件源
+echo "deb [signed-by=/etc/apt/keyrings/librealsenseai.gpg] https://librealsense.realsenseai.com/Debian/apt-repo `lsb_release -cs` main" | sudo tee /etc/apt/sources.list.d/librealsense.list
+4、更新包索引
+sudo apt update
+6、安装工具包
+sudo apt-get install librealsense2-utils
+7、安装开发包
+sudo apt-get install librealsense2-dev
+sudo apt-get install librealsense2-dbg
+
+二、RK3588 Ubuntu 开机自动登录与桌面修复说明
+1、设置默认自动登录用户为 zl
+修改配置：
+sudo nano /etc/lightdm/lightdm.conf
+
+修改为：
+[Seat:*]
+autologin-user=zl
+autologin-user-timeout=0
+
+2、创建登录后的桌面修复脚本
+2.1、创建目录：
+mkdir -p ~/.local/bin
+
+2.2、创建脚本：
+nano ~/.local/bin/startup-fix.sh
+
+写入：
+#!/bin/bash
+
+# 等待桌面初始化完成
+sleep 3
+
+# 设置桌面 framebuffer 为 1920x1080
+/usr/bin/xrandr --fb 1920x1080
+
+# 启动 XFCE 窗口管理器并关闭 compositor
+/usr/bin/xfwm4 --replace --compositor=off &
+
+2.3、添加执行权限：
+chmod +x ~/.local/bin/startup-fix.sh
+
+3、永久关闭 XFCE compositor
+执行：
+xfconf-query -c xfwm4 -p /general/use_compositing -s false
+
+4、设置脚本登录后自动启动
+创建目录：
+mkdir -p ~/.config/autostart
+创建文件：
+nano ~/.config/autostart/rk3588-startup-fix.desktop
+写入：
+[Desktop Entry]
+Type=Application
+Name=RK3588 Startup Fix
+Comment=Set resolution and start XFCE window manager
+Exec=/home/zl/.local/bin/startup-fix.sh
+Terminal=false
+StartupNotify=false
+X-GNOME-Autostart-enabled=true

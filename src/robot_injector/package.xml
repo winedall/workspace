@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<!--
+  recorder 事件注入节点包描述
+-->
+<package format="3">
+  <name>robot_injector</name>
+  <version>0.1.0</version>
+  <description>Simple event injection tool for robot_recorder testing</description>
+  <maintainer email="dev@zoomlion.com">developer</maintainer>
+  <license>Apache-2.0</license>
+
+  <!-- 构建工具依赖 -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- 运行时依赖 -->
+  <depend>rclcpp</depend>                          <!-- ROS 2 C++客户端库 -->
+  <depend>robot_interfaces</depend>                <!-- 消息和服务定义 -->
+
+  <!-- 测试依赖 -->
+
+  <!-- 导出包信息 -->
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

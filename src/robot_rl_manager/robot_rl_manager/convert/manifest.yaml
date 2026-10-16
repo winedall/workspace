@@ -1,0 +1,23 @@
+defaults:
+  target_platform: rk3588
+  allow_model_prefixes:
+    - "t4_"
+    - "z01_"
+  exclude_model_prefixes:
+    - "t4_kd_"
+  verify:
+    enabled: true
+    sample_count: 3
+    atol: 1.0e-4
+    rtol: 1.0e-4
+
+models:
+  t4_walk:
+    patches:
+      - random_normal_like_to_zero
+  t4_sprint:
+    patches:
+      - random_normal_like_to_zero
+  z01_std_walk:
+    patches:
+      - random_normal_like_to_zero

@@ -1,0 +1,17 @@
+# 里程计模型参数：z01_std_odom_with_acc
+#
+# 输入 91 维，含基座加速度（base_acc 插在 base_ang_vel 与 prev_joint_pos 之间）：
+#   joint_pos_current(27) + joint_vel(27) + base_quat(4)
+#   + base_ang_vel(3) + base_acc(3) + joint_pos_previous(27)
+#
+# base_acc 来源是 /robot/imu/nav_all 的 acc 字段（body 系线加速度，m/s^2）。
+# 训练来源：proprio_odometry/experiment_name=no_action_noise_with_acc
+model:
+  name: "z01_std_odom_with_acc"
+  type: "onnx"
+  control_frequency_hz: 50.0
+  observation_dim: 91
+  history_len: 50
+  odom_dim: 2
+  use_base_acceleration: true
+  obs_layout: "joint_pos_current(27) + joint_vel(27) + base_quat(4) + base_ang_vel(3) + base_acc(3) + joint_pos_previous(27)"

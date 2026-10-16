@@ -1,0 +1,9 @@
+# 目标模式，例如 idle、ready、rl、rule、fault_recovery。
+string target_mode
+# 模式切换原因。
+string reason
+---
+# 是否成功接受模式切换请求。
+bool success
+# 成功或失败的说明。
+string message

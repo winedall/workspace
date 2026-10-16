@@ -1,0 +1,60 @@
+# tienkung hardware 硬件配置模板。
+# 字段说明：
+#   vendor_type   - 厂商类型，当前为 tienkung
+#   bus_type      - 总线类型，当前为 ethercat
+#   ethercat      - EtherCAT 总线配置；network_interface 在真实硬件模式下需要配置为实际网卡
+#   name          - 关节名称，与 robot_joints.yaml 中的关节名对应
+#   motor_id      - 电机编号
+#   direction     - 电机旋转方向，+1 正转 / -1 反转
+#   offset        - 零位偏移量，单位度（关节空间）
+#   ratio         - 减速比，关节位置/速度/力矩到电机物理空间的缩放系数，默认 1.0
+# Tienkung/EtherCAT 可选字段：
+#   slave_id      - EtherCAT 逻辑从站编号
+#   bus           - CAN-FD 总线编号，0=CAN-FD0，1=CAN-FD1
+#   slot          - CAN-FD 槽位编号，0-based，单个 slave 内必须唯一
+#   kt            - 力矩系数，Nm/A
+hardware:
+  vendor_type: tienkung
+  bus_type: ethercat
+  ethercat:
+    network_interface: "eth1"
+    cycle_time_ms: 1.25
+    slave_count: 3
+  joints:
+    # 头部
+    - {name: head_yaw, motor_id: 1, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 1, bus: 1, slot: 0, kt: 1.35}}
+    - {name: head_pitch, motor_id: 2, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 1, bus: 1, slot: 1, kt: 1.35}}
+    # 左臂
+    - {name: left_shoulder_pitch, motor_id: 11, direction: +1, offset: -153.0, ratio: 1.0, tienkung: {slave_id: 1, bus: 0, slot: 0, kt: 1.37}}
+    - {name: left_shoulder_roll, motor_id: 12, direction: +1, offset: -130.0, ratio: 1.0, tienkung: {slave_id: 1, bus: 0, slot: 1, kt: 1.37}}
+    - {name: left_shoulder_yaw, motor_id: 13, direction: -1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 1, bus: 0, slot: 2, kt: 1.37}}
+    - {name: left_elbow, motor_id: 14, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 1, bus: 0, slot: 3, kt: 1.37}}
+    - {name: left_wrist_yaw, motor_id: 15, direction: -1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 1, bus: 0, slot: 4, kt: 1.37}}
+    - {name: left_wrist_pitch, motor_id: 16, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 1, bus: 0, slot: 5, kt: 1.35}}
+    - {name: left_wrist_roll, motor_id: 17, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 1, bus: 0, slot: 6, kt: 1.35}}
+    # 右臂
+    - {name: right_shoulder_pitch, motor_id: 21, direction: -1, offset: 153.0, ratio: 1.0, tienkung: {slave_id: 2, bus: 0, slot: 0, kt: 1.37}}
+    - {name: right_shoulder_roll, motor_id: 22, direction: +1, offset: 130.0, ratio: 1.0, tienkung: {slave_id: 2, bus: 0, slot: 1, kt: 1.37}}
+    - {name: right_shoulder_yaw, motor_id: 23, direction: -1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 2, bus: 0, slot: 2, kt: 1.37}}
+    - {name: right_elbow, motor_id: 24, direction: -1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 2, bus: 0, slot: 3, kt: 1.37}}
+    - {name: right_wrist_yaw, motor_id: 25, direction: -1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 2, bus: 0, slot: 4, kt: 1.37}}
+    - {name: right_wrist_pitch, motor_id: 26, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 2, bus: 0, slot: 5, kt: 1.35}}
+    - {name: right_wrist_roll, motor_id: 27, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 2, bus: 0, slot: 6, kt: 1.35}}
+    # 腰部
+    - {name: waist_pitch, motor_id: 31, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 2, bus: 1, slot: 1, kt: 1.572}}
+    - {name: waist_roll, motor_id: 32, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 2, bus: 1, slot: 2, kt: 1.572}}
+    - {name: waist_yaw, motor_id: 33, direction: -1, offset: -145.0, ratio: 1.0, tienkung: {slave_id: 2, bus: 1, slot: 0, kt: 3.5}}
+    # 左腿
+    - {name: left_hip_pitch, motor_id: 41, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 3, bus: 0, slot: 0, kt: 3.5}}
+    - {name: left_hip_roll, motor_id: 42, direction: +1, offset: 30.0, ratio: 1.0, tienkung: {slave_id: 3, bus: 0, slot: 1, kt: 3.5}}
+    - {name: left_hip_yaw, motor_id: 43, direction: -1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 3, bus: 0, slot: 2, kt: 3.5}}
+    - {name: left_knee, motor_id: 44, direction: +1, offset: 5.0, ratio: 1.0, tienkung: {slave_id: 3, bus: 0, slot: 3, kt: 3.5}}
+    - {name: left_ankle_pitch, motor_id: 45, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 3, bus: 0, slot: 4, kt: 1.6}}
+    - {name: left_ankle_roll, motor_id: 46, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 3, bus: 0, slot: 5, kt: 1.6}}
+    # 右腿
+    - {name: right_hip_pitch, motor_id: 51, direction: -1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 3, bus: 1, slot: 0, kt: 3.5}}
+    - {name: right_hip_roll, motor_id: 52, direction: +1, offset: -30.0, ratio: 1.0, tienkung: {slave_id: 3, bus: 1, slot: 1, kt: 3.5}}
+    - {name: right_hip_yaw, motor_id: 53, direction: -1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 3, bus: 1, slot: 2, kt: 3.5}}
+    - {name: right_knee, motor_id: 54, direction: -1, offset: -5.0, ratio: 1.0, tienkung: {slave_id: 3, bus: 1, slot: 3, kt: 3.5}}
+    - {name: right_ankle_pitch, motor_id: 55, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 3, bus: 1, slot: 4, kt: 1.6}}
+    - {name: right_ankle_roll, motor_id: 56, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 3, bus: 1, slot: 5, kt: 1.6}}

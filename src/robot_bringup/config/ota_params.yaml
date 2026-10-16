@@ -1,0 +1,7 @@
+/**:
+  ros__parameters:
+    port: 8000
+    host: "0.0.0.0"
+    secret_key: "CHANGE_ME_IN_PRODUCTION"
+    admin_username: "admin"
+    admin_password_hash: ""

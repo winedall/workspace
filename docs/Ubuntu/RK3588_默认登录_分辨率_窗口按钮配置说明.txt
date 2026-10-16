@@ -1,0 +1,146 @@
+RK3588 Ubuntu 开机自动登录与桌面修复说明
+=====================================
+适用环境：
+- RK3588 Ubuntu
+- LightDM
+- XFCE / Xubuntu
+- X11
+- 用户：zl、rockchip
+
+目标：
+1. 开机默认自动登录 zl
+2. 登录后自动设置 1920x1080 分辨率
+3. 自动启动 xfwm4，恢复窗口最大化/最小化、拖动和拉伸功能
+
+一、设置默认自动登录用户为 zl
+-----------------------------
+1. 确认显示管理器：
+cat /etc/X11/default-display-manager
+
+应输出：
+/usr/sbin/lightdm
+
+2. 查看当前自动登录配置：
+grep -Rni "autologin-user" /etc/lightdm /usr/share/lightdm 2>/dev/null
+
+本机实际发现：
+/etc/lightdm/lightdm.conf: autologin-user=rockchip
+
+说明真正生效的是：
+/etc/lightdm/lightdm.conf
+
+3. 备份配置：
+sudo cp /etc/lightdm/lightdm.conf /etc/lightdm/lightdm.conf.bak
+
+4. 修改配置：
+sudo nano /etc/lightdm/lightdm.conf
+
+修改为：
+[Seat:*]
+autologin-user=zl
+autologin-user-timeout=0
+
+5. 如果之前创建过重复配置，可删除：
+sudo rm -f /etc/lightdm/lightdm.conf.d/99-autologin.conf
+
+二、创建登录后的桌面修复脚本
+---------------------------
+创建目录：
+mkdir -p ~/.local/bin
+
+创建脚本：
+nano ~/.local/bin/startup-fix.sh
+
+写入：
+#!/bin/bash
+
+# 等待桌面初始化完成
+sleep 3
+
+# 设置桌面 framebuffer 为 1920x1080
+/usr/bin/xrandr --fb 1920x1080
+
+# 启动 XFCE 窗口管理器并关闭 compositor
+/usr/bin/xfwm4 --replace --compositor=off &
+
+添加执行权限：
+chmod +x ~/.local/bin/startup-fix.sh
+
+三、永久关闭 XFCE compositor
+----------------------------
+执行：
+xfconf-query -c xfwm4 -p /general/use_compositing -s false
+
+说明：
+RK3588 当前图形环境下，xfwm4 默认 compositor 会触发 GLX 报错。
+关闭 compositor 后，窗口管理功能仍可正常使用。
+
+四、设置脚本登录后自动启动
+--------------------------
+创建目录：
+mkdir -p ~/.config/autostart
+
+创建文件：
+nano ~/.config/autostart/rk3588-startup-fix.desktop
+
+写入：
+[Desktop Entry]
+Type=Application
+Name=RK3588 Startup Fix
+Comment=Set resolution and start XFCE window manager
+Exec=/home/zl/.local/bin/startup-fix.sh
+Terminal=false
+StartupNotify=false
+X-GNOME-Autostart-enabled=true
+
+五、重启验证
+------------
+执行：
+sudo reboot
+
+重启后检查当前用户：
+whoami
+
+应输出：
+zl
+
+检查 HOME：
+echo $HOME
+
+应输出：
+/home/zl
+
+检查分辨率：
+xrandr
+
+应看到：
+current 1920 x 1080
+
+检查 xfwm4：
+ps -ef | grep xfwm4 | grep -v grep
+
+应看到类似：
+/usr/bin/xfwm4 --replace --compositor=off
+
+最终效果
+--------
+RK3588 开机
+   ↓
+LightDM
+   ↓
+自动登录 zl
+   ↓
+进入 /home/zl
+   ↓
+自动执行 startup-fix.sh
+   ↓
+xrandr --fb 1920x1080
+   ↓
+xfwm4 --replace --compositor=off
+   ↓
+最终实现：
+- 默认登录 zl
+- 桌面为 1920x1080
+- 窗口最大化/最小化按钮正常
+- 窗口可拖动
+- 窗口可拉伸调整大小

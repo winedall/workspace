@@ -1,0 +1,164 @@
+一、安装docker
+1、清除ubuntu旧docker包
+sudo apt remove -y docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc
+
+2、安装docker
+sudo apt update
+sudo apt install -y ca-certificates curl
+
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+sudo tee /etc/apt/sources.list.d/docker.sources > /dev/null <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+
+sudo apt update
+
+sudo apt install -y \
+  docker-ce=5:24.0.7-1~ubuntu.22.04~jammy \
+  docker-ce-cli=5:24.0.7-1~ubuntu.22.04~jammy \
+  containerd.io=1.6.24-1 \
+  docker-buildx-plugin=0.11.2-1~ubuntu.22.04~jammy \
+  docker-compose-plugin=2.21.0-1~ubuntu.22.04~jammy
+  
+3、验证docker
+sudo systemctl status docker
+sudo docker run hello-world
+
+4、把当前用户加入 docker 组
+sudo usermod -aG docker $USER
+
+二、制作基础镜像
+1、使用dockerfile生成zl_robot基础镜像
+sudo docker build -f ./Dockerfile -t zl_robot:base .
+说明：Dockerfile 已默认设置 root 密码为 123456，并启用 ssh.service。
+说明：Dockerfile 已集成 onnxruntime、pyaudio、grpcio、grpcio-tools、piper-tts、numpy==1.26.4、
+portaudio19-dev、libportaudio2、alsa-utils、ros-humble-cv-bridge 等运行依赖。
+说明：Dockerfile 已集成 Xvfb + Mesa 软件渲染依赖，并设置 LIBGL_ALWAYS_SOFTWARE=1，用于容器内 MuJoCo/GLFW。
+
+2、查看镜像
+sudo docker image list
+
+三、使用容器
+统一使用 dockerctl.sh 管理容器和镜像。
+
+默认约定：
+- 容器名：zl_robot
+- 镜像名：zl_robot:base
+- 网络：Docker 默认 bridge 网络
+- 初始化：容器 PID 1 使用 systemd（/sbin/init）
+- SSH：由容器内 ssh.service 管理；不映射宿主机端口，通过容器 bridge IP 访问容器 22 端口
+- 不挂载宿主机目录；容器内安装的 /root/.zl_robot 会随 docker commit 进入镜像
+
+1、首次从 ROS Humble 创建基础容器
+sudo docker run -it --name zl_robot --network bridge --privileged ros:humble bash
+
+在容器中安装 systemd、openssh-server、OTA 运行环境等：
+apt update
+apt install -y systemd systemd-sysv dbus sudo openssh-server iproute2
+
+配置 SSH 并交给 systemd 管理：
+mkdir -p /run/sshd
+ssh-keygen -A
+sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sed -i 's/^#\?UsePAM.*/UsePAM yes/' /etc/ssh/sshd_config
+echo 'root:123456' | chpasswd
+systemctl enable ssh.service
+
+注意：不要使用 --rm，否则容器退出后无法 commit。
+
+2、把容器提交为第一个 zl_robot 镜像
+./dockerctl.sh commit v1.0
+./dockerctl.sh tag v1.0
+
+3、启动 base 镜像
+./dockerctl.sh run
+
+run 会后台启动 systemd 容器，等价于：
+- 使用 /sbin/init 作为 PID 1
+- 使用 --privileged
+- 使用 --cgroupns=host
+- 挂载 /sys/fs/cgroup
+- 使用 tmpfs /run 和 /run/lock
+
+4、进入容器
+./dockerctl.sh shell
+
+5、停止容器
+./dockerctl.sh stop
+
+6、启动已停止的容器
+./dockerctl.sh start
+
+7、删除已停止容器
+./dockerctl.sh rm
+
+8、查看容器
+./dockerctl.sh ps
+
+9、查看容器 bridge IP
+./dockerctl.sh ip
+
+10、查看当前全部镜像
+./dockerctl.sh images
+
+11、查看日志
+./dockerctl.sh logs
+
+12、查看容器内 systemd journal
+./dockerctl.sh journal
+
+13、容器中升级环境或 OTA 程序后，提交新版本
+./dockerctl.sh commit v1.1
+./dockerctl.sh tag v1.1
+
+四、部署说明
+1、通过host模式运行容器
+./dockerctl.sh run
+
+2、拷贝程序到容器并解压
+docker cp zl_robot-1.1.9-linux-amd64.tar.gz zl_robot:/root/.zl_robot
+cd /root/.zl_robot
+tar -xvf zl_robot-1.1.9-linux-amd64.tar.gz
+
+3、在容器中运行
+./scripts/install.sh
+
+4、在容器的~/.bashrc中添加如下内容：
+source /root/.zl_robot/install/setup.bash
+
+export ROS_LOCALHOST_ONLY=0
+export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+export CYCLONEDDS_URI="file:///root/.config/cyclonedds_robot_bridge.xml"
+
+五、发布镜像
+1、把当前容器提交成镜像，例如版本 v1.0.0：
+./dockerctl.sh commit v1.0.0
+
+2、导出镜像成tar文件
+sudo docker save -o zl_robot_v1.0.0.tar zl_robot:v1.0.0
+
+3、压缩tar文件
+gzip -9 zl_robot_v1.0.0.tar
+得到
+zl_robot_v1.0.0.tar.gz
+
+4、用户侧导入
+gunzip -c zl_robot_v1.0.0.tar.gz | sudo docker load
+或者如果没压缩
+sudo docker load -i zl_robot_v1.0.0.tar
+
+5、用户运行
+xhost +local:root
+xhost +SI:localuser:root
+DOCKERCTL_DEFAULT_TAG=v1.1.9 ./dockerctl.sh run
+./dockerctl.sh shell
+

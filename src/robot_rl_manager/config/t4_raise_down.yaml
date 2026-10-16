@@ -1,0 +1,47 @@
+model:
+  name: t4_raise_down             # 模型名称，与 rl_models.yaml 中的 key 对应
+  control_frequency_hz: 50        # 策略控制频率，单位 Hz
+  observation_dim: 1              # 观测向量维度（pipeline 无实际观测，占位用）
+  action_dim: 1                   # 动作向量维度（pipeline 无实际推理动作，占位用）
+  ankle_in_series: true    # 当前模型是否输出串联踝关节（true=串联模型，false=并联模型，robot_control 据此做踝关节空间转换）
+
+joint_profiles:
+  run:
+    joints:
+      # head
+      - {joint_name: head_yaw, position: 0.0, kp: 20.0, kd: 2.0}
+      - {joint_name: head_pitch, position: 0.0, kp: 20.0, kd: 2.0}
+      # left_arm
+      - {joint_name: left_shoulder_pitch, position: 0.2, kp: 93.169, kd: 5.931}
+      - {joint_name: left_shoulder_roll, position: 0.15, kp: 93.169, kd: 5.931}
+      - {joint_name: left_shoulder_yaw, position: 0.0, kp: 93.169, kd: 5.931}
+      - {joint_name: left_elbow, position: -0.5, kp: 93.169, kd: 5.931}
+      - {joint_name: left_wrist_yaw, position: 0.0, kp: 93.169, kd: 5.931}
+      - {joint_name: left_wrist_pitch, position: 0.0, kp: 21.713, kd: 1.382}
+      - {joint_name: left_wrist_roll, position: 0.0, kp: 21.713, kd: 1.382}
+      # right_arm
+      - {joint_name: right_shoulder_pitch, position: 0.2, kp: 93.169, kd: 5.931}
+      - {joint_name: right_shoulder_roll, position: -0.15, kp: 93.169, kd: 5.931}
+      - {joint_name: right_shoulder_yaw, position: 0.0, kp: 93.169, kd: 5.931}
+      - {joint_name: right_elbow, position: -0.5, kp: 93.169, kd: 5.931}
+      - {joint_name: right_wrist_yaw, position: 0.0, kp: 93.169, kd: 5.931}
+      - {joint_name: right_wrist_pitch, position: 0.0, kp: 21.713, kd: 1.382}
+      - {joint_name: right_wrist_roll, position: 0.0, kp: 21.713, kd: 1.382}
+      # waist
+      - {joint_name: waist_pitch, position: 0.0, kp: 0.0, kd: 0}
+      - {joint_name: waist_roll, position: 0.0, kp: 0.0, kd: 0}
+      - {joint_name: waist_yaw, position: 0.0, kp: 372.281, kd: 23.700}
+      # left_leg
+      - {joint_name: left_hip_pitch, position: -0.2, kp: 246.740, kd: 15.708}
+      - {joint_name: left_hip_roll, position: 0.0, kp: 372.281, kd: 23.700}
+      - {joint_name: left_hip_yaw, position: 0.0, kp: 372.281, kd: 23.700}
+      - {joint_name: left_knee, position: 0.4, kp: 246.740, kd: 15.708}
+      - {joint_name: left_ankle_pitch, position: -0.24, kp: 186.338, kd: 11.863}
+      - {joint_name: left_ankle_roll, position: 0.0, kp: 186.338, kd: 11.863}
+      # right_leg
+      - {joint_name: right_hip_pitch, position: -0.2, kp: 246.740, kd: 15.708}
+      - {joint_name: right_hip_roll, position: 0.0, kp: 372.281, kd: 23.700}
+      - {joint_name: right_hip_yaw, position: 0.0, kp: 372.281, kd: 23.700}
+      - {joint_name: right_knee, position: 0.4, kp: 246.740, kd: 15.708}
+      - {joint_name: right_ankle_pitch, position: -0.24, kp: 186.338, kd: 11.863}
+      - {joint_name: right_ankle_roll, position: 0.0, kp: 186.338, kd: 11.863}

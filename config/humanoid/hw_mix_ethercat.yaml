@@ -1,0 +1,61 @@
+# mix + EtherCAT gateway 硬件配置模板。
+# 适用场景：
+#   - 同一台人形机器人混装 Encos 与 Tienkung 电机；
+#   - 上层仍按厂家协议生成 CANFD 帧，底层通过 IGH EtherCAT gateway 的 PDO 槽位转发。
+#
+# 字段说明：
+#   vendor_type - 固定为 mix，表示启用 MixBackend 的混装协议路由。
+#   bus_type    - 固定为 ethercat，表示底层使用 GatewayCanfdTransport。
+#   gateway     - 中性通道定位字段：slave_id 为 EtherCAT 从站，bus/slot 为网关内 CAN-FD 槽位。
+#   vendor      - 单关节厂家协议：encos 或 tienkung。
+#   encos       - Encos 厂家协议参数，只保留协议换算所需字段。
+#   tienkung    - Tienkung 厂家协议参数，只保留协议换算所需字段。
+#
+# 注意：
+#   1. 同一个 gateway.slave_id + gateway.bus 内 motor_id 必须唯一。
+#   2. 同一个 gateway.slave_id + gateway.bus + gateway.slot 必须唯一。
+hardware:
+  vendor_type: mix
+  bus_type: ethercat
+  ethercat:
+    network_interface: "eth1"
+    cycle_time_ms: 2.5
+    slave_count: 3
+  joints:
+    # 头部（Encos）
+    - {name: head_yaw, vendor: encos, motor_id: 1, direction: +1, offset: 0, ratio: 1.0, gateway: {slave_id: 1, bus: 1, slot: 0}, encos: {kt: 1.35, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -12.0, tor_max: 12.0, cur_min: -10.0, cur_max: 10.0}}
+    - {name: head_pitch, vendor: encos, motor_id: 2, direction: +1, offset: 0, ratio: 1.0, gateway: {slave_id: 1, bus: 1, slot: 1}, encos: {kt: 1.35, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -12.0, tor_max: 12.0, cur_min: -10.0, cur_max: 10.0}}
+    # 左臂（1-5 号 Tienkung；6-7 号 Encos）
+    - {name: left_shoulder_pitch, vendor: tienkung, motor_id: 11, direction: +1, offset: -154.0, ratio: 1.0, gateway: {slave_id: 1, bus: 0, slot: 0}, tienkung: {kt: 1.37}}
+    - {name: left_shoulder_roll, vendor: tienkung, motor_id: 12, direction: +1, offset: -129.0, ratio: 1.0, gateway: {slave_id: 1, bus: 0, slot: 1}, tienkung: {kt: 1.37}}
+    - {name: left_shoulder_yaw, vendor: tienkung, motor_id: 13, direction: -1, offset: -150.5, ratio: 1.0, gateway: {slave_id: 1, bus: 0, slot: 2}, tienkung: {kt: 1.37}}
+    - {name: left_elbow, vendor: tienkung, motor_id: 14, direction: +1, offset: 121.0, ratio: 1.0, gateway: {slave_id: 1, bus: 0, slot: 3}, tienkung: {kt: 1.37}}
+    - {name: left_wrist_yaw, vendor: tienkung, motor_id: 15, direction: -1, offset: -150.5, ratio: 1.0, gateway: {slave_id: 1, bus: 0, slot: 4}, tienkung: {kt: 1.37}}
+    - {name: left_wrist_pitch, vendor: encos, motor_id: 16, direction: -1, offset: 80.0, ratio: 1.0, gateway: {slave_id: 1, bus: 0, slot: 5}, encos: {kt: 1.35, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -12.0, tor_max: 12.0, cur_min: -10.0, cur_max: 10.0}}
+    - {name: left_wrist_roll, vendor: encos, motor_id: 17, direction: +1, offset: 87.5, ratio: 1.0, gateway: {slave_id: 1, bus: 0, slot: 6}, encos: {kt: 1.35, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -12.0, tor_max: 12.0, cur_min: -10.0, cur_max: 10.0}}
+    # 右臂（1-5 号 Tienkung；6-7 号 Encos）
+    - {name: right_shoulder_pitch, vendor: tienkung, motor_id: 21, direction: -1, offset: 154.0, ratio: 1.0, gateway: {slave_id: 2, bus: 0, slot: 0}, tienkung: {kt: 1.37}}
+    - {name: right_shoulder_roll, vendor: tienkung, motor_id: 22, direction: +1, offset: 129.0, ratio: 1.0, gateway: {slave_id: 2, bus: 0, slot: 1}, tienkung: {kt: 1.37}}
+    - {name: right_shoulder_yaw, vendor: tienkung, motor_id: 23, direction: -1, offset: 150.5, ratio: 1.0, gateway: {slave_id: 2, bus: 0, slot: 2}, tienkung: {kt: 1.37}}
+    - {name: right_elbow, vendor: tienkung, motor_id: 24, direction: -1, offset: -121.0, ratio: 1.0, gateway: {slave_id: 2, bus: 0, slot: 3}, tienkung: {kt: 1.37}}
+    - {name: right_wrist_yaw, vendor: tienkung, motor_id: 25, direction: -1, offset: 150.5, ratio: 1.0, gateway: {slave_id: 2, bus: 0, slot: 4}, tienkung: {kt: 1.37}}
+    - {name: right_wrist_pitch, vendor: encos, motor_id: 26, direction: +1, offset: -80.0, ratio: 1.0, gateway: {slave_id: 2, bus: 0, slot: 5}, encos: {kt: 1.35, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -12.0, tor_max: 12.0, cur_min: -10.0, cur_max: 10.0}}
+    - {name: right_wrist_roll, vendor: encos, motor_id: 27, direction: +1, offset: -87.5, ratio: 1.0, gateway: {slave_id: 2, bus: 0, slot: 6}, encos: {kt: 1.35, kp_min: 0.0, kp_max: 500.0, kd_min: 0.0, kd_max: 5.0, pos_min: -12.5, pos_max: 12.5, spd_min: -18.0, spd_max: 18.0, tor_min: -12.0, tor_max: 12.0, cur_min: -10.0, cur_max: 10.0}}
+    # 腰部（Tienkung）
+    - {name: waist_pitch, vendor: tienkung, motor_id: 31, direction: +1, offset: 0.0, ratio: 1.0, gateway: {slave_id: 2, bus: 1, slot: 1}, tienkung: {kt: 1.572}}
+    - {name: waist_roll, vendor: tienkung, motor_id: 32, direction: +1, offset: 0.0, ratio: 1.0, gateway: {slave_id: 2, bus: 1, slot: 2}, tienkung: {kt: 1.572}}
+    - {name: waist_yaw, vendor: tienkung, motor_id: 33, direction: -1, offset: 150.0, ratio: 1.0, gateway: {slave_id: 2, bus: 1, slot: 0}, tienkung: {kt: 1.572}}
+    # 左腿（Tienkung）
+    - {name: left_hip_pitch, vendor: tienkung, motor_id: 41, direction: +1, offset: 165.0, ratio: 1.0, gateway: {slave_id: 3, bus: 0, slot: 0}, tienkung: {kt: 1.572}}
+    - {name: left_hip_roll, vendor: tienkung, motor_id: 42, direction: +1, offset: -170.0, ratio: 1.0, gateway: {slave_id: 3, bus: 0, slot: 1}, tienkung: {kt: 1.572}}
+    - {name: left_hip_yaw, vendor: tienkung, motor_id: 43, direction: -1, offset: 158.0, ratio: 1.0, gateway: {slave_id: 3, bus: 0, slot: 2}, tienkung: {kt: 1.572}}
+    - {name: left_knee, vendor: tienkung, motor_id: 44, direction: +1, offset: 5.0, ratio: 1.0, gateway: {slave_id: 3, bus: 0, slot: 3}, tienkung: {kt: 1.572}}
+    - {name: left_ankle_pitch, vendor: tienkung, motor_id: 45, direction: +1, offset: -65.2, ratio: 1.0, gateway: {slave_id: 3, bus: 0, slot: 4}, tienkung: {kt: 1.37}}
+    - {name: left_ankle_roll, vendor: tienkung, motor_id: 46, direction: +1, offset: 65.1, ratio: 1.0, gateway: {slave_id: 3, bus: 0, slot: 5}, tienkung: {kt: 1.37}}
+    # 右腿（Tienkung）
+    - {name: right_hip_pitch, vendor: tienkung, motor_id: 51, direction: -1, offset: -165.0, ratio: 1.0, gateway: {slave_id: 3, bus: 1, slot: 0}, tienkung: {kt: 1.572}}
+    - {name: right_hip_roll, vendor: tienkung, motor_id: 52, direction: +1, offset: 170.0, ratio: 1.0, gateway: {slave_id: 3, bus: 1, slot: 1}, tienkung: {kt: 1.572}}
+    - {name: right_hip_yaw, vendor: tienkung, motor_id: 53, direction: -1, offset: -158.0, ratio: 1.0, gateway: {slave_id: 3, bus: 1, slot: 2}, tienkung: {kt: 1.572}}
+    - {name: right_knee, vendor: tienkung, motor_id: 54, direction: -1, offset: -5.0, ratio: 1.0, gateway: {slave_id: 3, bus: 1, slot: 3}, tienkung: {kt: 1.572}}
+    - {name: right_ankle_pitch, vendor: tienkung, motor_id: 55, direction: +1, offset: 65.2, ratio: 1.0, gateway: {slave_id: 3, bus: 1, slot: 4}, tienkung: {kt: 1.37}}
+    - {name: right_ankle_roll, vendor: tienkung, motor_id: 56, direction: +1, offset: -65.1, ratio: 1.0, gateway: {slave_id: 3, bus: 1, slot: 5}, tienkung: {kt: 1.37}}

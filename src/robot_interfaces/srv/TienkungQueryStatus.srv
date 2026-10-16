@@ -1,0 +1,16 @@
+# Tienkung 配置命令：查询指定关节的电机状态。
+# timeout_sec <= 0 时由 robot_driver 使用默认超时时间。
+string joint_name
+float32 timeout_sec
+---
+# success=false 可能表示超时、backend 不支持、EtherCAT 故障或厂家反馈失败。
+bool success
+string message
+uint16 motor_id
+uint8 feedback_code
+float64 position
+float64 velocity
+float64 effort
+uint16 motor_error
+float32 motor_temp
+float32 mos_temp

@@ -1,0 +1,16 @@
+# Mix CANFD 配置命令：按关节名查询当前状态。
+# timeout_sec <= 0 时由 robot_driver 使用默认超时时间。
+string joint_name
+float32 timeout_sec
+---
+bool success
+string message
+string vendor
+uint16 motor_id
+uint8 feedback_code
+float64 position
+float64 velocity
+float64 effort
+uint16 motor_error
+float32 motor_temp
+float32 mos_temp

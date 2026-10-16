@@ -1,0 +1,54 @@
+/**:
+  ros__parameters:
+    # 采集频率（Hz）
+    rate_hz: 1.0
+    # 磁盘检查路径
+    disk_path: "/"
+    # 电池信息来源：robot 订阅 battery/info；usbcan 订阅旧版 /usbcan_bridge/battery_info
+    battery_source: "robot"
+    # 是否启用语音告警（总开关）
+    voice_enabled: true
+    # 同类告警播报冷却时间（秒），冷却期内不再重复播报
+    alert_cooldown_sec: 30.0
+
+    # ---------- 各告警类型的独立语音播报开关 ----------
+    # 仅控制播报，不影响告警标志写入 SystemStatus
+    voice_cpu_usage: false
+    voice_cpu_temp: false
+    voice_mem_usage: false
+    voice_disk_usage: false
+    voice_batt_soc: true
+    voice_batt_voltage: true
+    voice_batt_mos_temp: false
+
+    # ---------- 阈值 ----------
+    # CPU 使用率告警上限（%）
+    cpu_usage_max: 80.0
+    # CPU 温度告警上限（摄氏度）
+    cpu_temp_max: 80.0
+    # 内存占用率告警上限（%）
+    mem_usage_max: 90.0
+    # 磁盘占用率告警上限（%）
+    disk_usage_max: 90.0
+    # 电池 SOC 告警下限（%）
+    batt_soc_min: 20.0
+    # 电池电压告警下限（伏特）
+    batt_voltage_min: 21.0
+    # 电池 MOS 温度告警上限（摄氏度）
+    batt_mos_temp_max: 80.0
+
+    # ---------- 音量守护 ----------
+    # 是否自动恢复被外部修改的系统音量/静音状态
+    audio_guard: true
+    # 音量检测频率（Hz）
+    audio_rate_hz: 1.0
+    # 默认期望系统输出音量（%）
+    audio_volume: 100.0
+    # 音量容差（%），避免四舍五入导致反复设置
+    audio_volume_tol: 2.0
+    # 音频后端：auto/pactl/amixer
+    audio_backend: "auto"
+
+    # ---------- 版本信息 ----------
+    # VERSION.txt 文件路径（为空时从当前目录向上自动搜索）
+    version_file: ""

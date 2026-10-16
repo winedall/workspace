@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+{% block title %}设备管理{% endblock %}
+{% block heading %}设备管理{% endblock %}
+{% block content %}
+<div class="d-flex justify-between align-center mb-16">
+<div></div>
+<button class="btn btn-primary" onclick="showAddModal()">+ 添加设备</button>
+</div>
+<div class="card">
+<table><thead><tr><th>ID</th><th>IP 地址</th><th>当前版本</th><th>Agent 状态</th><th>机器人程序</th><th>心跳时间</th><th>操作</th></tr></thead><tbody id="devicesBody"></tbody></table>
+</div>
+<div class="modal" id="addModal">
+<div class="modal-content">
+<h3>添加设备</h3>
+<div class="form-group"><label>设备 ID</label><input type="text" id="f_id" required placeholder="例如 robot-01"></div>
+<div style="display:flex;gap:12px">
+<div class="form-group" style="flex:1"><label>服务端地址</label><select id="f_server_host"><option value="127.0.0.1">127.0.0.1 (本机)</option>{% for ip in server_ips %}<option value="{{ ip }}">{{ ip }}</option>{% endfor %}</select></div>
+<div class="form-group" style="flex:0 0 120px"><label>端口</label><input type="number" id="f_server_port" min="1" max="65535"></div>
+</div>
+<div class="form-actions">
+<button class="btn" onclick="hideAddModal()">取消</button>
+<button class="btn btn-primary" onclick="addDevice()">添加</button>
+</div>
+</div>
+</div>
+<div class="modal" id="deployAgentModal">
+<div class="modal-content" style="max-width:560px;max-height:95vh">
+<h3>部署 Agent</h3>
+<div class="form-group"><label>设备 ID</label><input type="text" id="ad_device_id" readonly style="background:#f5f5f5"></div>
+<div class="form-group"><label>机器人地址</label><input type="text" id="ad_host" value="127.0.0.1" onclick="this.select()"></div>
+<div style="display:flex;gap:12px">
+<div class="form-group" style="flex:1"><label>SSH 用户</label><input type="text" id="ad_user" value="zoomlion" onclick="this.select()"></div>
+<div class="form-group" style="flex:0 0 100px"><label>SSH 端口</label><input type="number" id="ad_port" value="22" min="1" max="65535"></div>
+</div>
+<div class="form-group"><label>SSH / Sudo 密码</label><input type="password" id="ad_password" placeholder="SSH 登录密码"></div>
+<div class="form-group"><label>安装路径</label><input type="text" id="ad_agent_root" value="{{ default_agent_root }}" placeholder="Agent 安装目录"></div>
+<div style="display:flex;gap:12px">
+<div class="form-group" style="flex:1">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+<label style="display:inline;font-size:14px;font-weight:600;color:#555">日志</label>
+<span><span style="font-size:12px;color:#888">状态：</span><span id="ad_status_badge" class="badge badge-default">就绪</span></span>
+</div>
+<textarea id="ad_log" readonly rows="5" style="font-family:monospace;min-height:100px;background:#f5f5f5;resize:vertical;width:100%;padding:8px 12px;border:1px solid #d9d9d9;border-radius:6px;font-size:14px;outline:none"></textarea>
+<div class="form-actions" style="margin-top:8px">
+<button class="btn" onclick="hideAgentDeploy()">关闭</button>
+<button class="btn btn-primary" id="ad_start_btn" onclick="startAgentDeploy()">部署</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="modal" id="deviceDetailModal">
+<div class="modal-content" style="max-width:640px;display:flex;flex-direction:column;max-height:80vh">
+<h3 style="flex-shrink:0">设备详情</h3>
+<div id="dd_body" style="flex-shrink:0;margin-bottom:16px"></div>
+<h4 style="flex-shrink:0;margin-bottom:8px">版本历史</h4>
+<div style="flex:1;min-height:0;overflow-y:auto;border:1px solid #eee;border-radius:4px">
+<table style="width:100%;border-collapse:collapse"><thead><tr style="position:sticky;top:0;background:#fff;box-shadow:0 1px 0 #eee"><th>起始版本</th><th>目标版本</th><th>状态</th><th>时间</th></tr></thead><tbody id="dd_history"></tbody></table>
+</div>
+<div class="form-actions" style="flex-shrink:0;margin-top:16px">
+<button class="btn" onclick="hideDeviceDetail()">关闭</button>
+</div>
+</div>
+</div>
+<script>
+var currentDeployDeviceId = null;
+var currentAgentDeployId = null;
+var agentDeployTimer = null;
+var statusMap = {pending:'等待中',running:'运行中',succeeded:'成功',failed:'失败'};
+function statusText(s) { return statusMap[s] || s; }
+var defaultAgentRoot = '{{ default_agent_root }}';
+
+function showAddModal() {
+    var sel = document.getElementById('f_server_host');
+    var hostname = window.location.hostname;
+    for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === hostname) {
+            sel.selectedIndex = i;
+            break;
+        }
+    }
+    document.getElementById('f_server_port').value = window.location.port || '8000';
+    document.getElementById('addModal').classList.add('show');
+}
+function hideAddModal() { document.getElementById('addModal').classList.remove('show'); }
+function showAgentDeploy(deviceId) {
+    currentDeployDeviceId = deviceId;
+    currentAgentDeployId = null;
+    document.getElementById('ad_device_id').value = deviceId;
+    document.getElementById('ad_host').value = '127.0.0.1';
+    document.getElementById('ad_user').value = 'zoomlion';
+    document.getElementById('ad_port').value = '22';
+    document.getElementById('ad_password').value = '';
+    document.getElementById('ad_agent_root').value = defaultAgentRoot;
+    document.getElementById('ad_status_badge').textContent = '就绪';
+    document.getElementById('ad_status_badge').className = 'badge badge-default';
+    document.getElementById('ad_log').value = '';
+    document.getElementById('ad_start_btn').disabled = false;
+    document.getElementById('deployAgentModal').classList.add('show');
+}
+function hideAgentDeploy() {
+    document.getElementById('deployAgentModal').classList.remove('show');
+    if (agentDeployTimer) {
+        clearInterval(agentDeployTimer);
+        agentDeployTimer = null;
+    }
+    // 部署完成后持续刷新设备列表，等待 agent 上线
+    var refreshCount = 0;
+    var refreshTimer = setInterval(function() {
+        loadDevices();
+        refreshCount++;
+        if (refreshCount >= 10) clearInterval(refreshTimer);
+    }, 3000);
+    loadDevices();
+}
+function showDeviceDetail(deviceId) {
+    apiFetch('/api/v1/devices/' + encodeURIComponent(deviceId) + '/detail').then(function(r) {
+        if (!r.ok) throw new Error('加载设备详情失败');
+        return r.json();
+    }).then(function(d) {
+        var agentClass = d.agent_online ? 'badge-success' : 'badge-default';
+        var agentText = d.agent_online ? '在线' : '离线';
+        var robotClass = d.robot_online ? 'badge-success' : 'badge-default';
+        var robotText = d.robot_online ? '在线' : '离线';
+        var html = '<table><tbody>' +
+            '<tr><td style="font-weight:600;width:120px">设备 ID</td><td><code>' + escapeHtml(d.id) + '</code></td></tr>' +
+            '<tr><td style="font-weight:600">IP 地址</td><td>' + escapeHtml(d.agent_address) + '</td></tr>' +
+            '<tr><td style="font-weight:600">当前版本</td><td>' + escapeHtml(d.current_version || '-') + '</td></tr>' +
+            '<tr><td style="font-weight:600">Agent 状态</td><td><span class="badge ' + agentClass + '">' + agentText + '</span></td></tr>' +
+            '<tr><td style="font-weight:600">机器人状态</td><td><span class="badge ' + robotClass + '">' + robotText + '</span></td></tr>' +
+            '<tr><td style="font-weight:600">最后心跳</td><td>' + localTime(d.last_heartbeat) + '</td></tr>' +
+            '<tr><td style="font-weight:600">创建时间</td><td>' + localTime(d.created_at) + '</td></tr>' +
+            '</tbody></table>';
+        document.getElementById('dd_body').innerHTML = html;
+        var tbody = document.getElementById('dd_history');
+        tbody.innerHTML = '';
+        if (d.version_history && d.version_history.length > 0) {
+            d.version_history.forEach(function(v) {
+                var _s = v.status.toLowerCase();
+                var _m = {
+                    'succeeded': {c:'badge-success',t:'成功'},
+                    'failed': {c:'badge-danger',t:'失败'},
+                    'rolled_back': {c:'badge-warning',t:'已回滚'},
+                    'recovery_required': {c:'badge-danger',t:'需要恢复'},
+                    'cancelled': {c:'badge-default',t:'已取消'},
+                    'created': {c:'badge-info',t:'已创建'},
+                    'running': {c:'badge-info',t:'运行中'},
+                    'pending': {c:'badge-default',t:'等待中'},
+                    'rollback_succeeded': {c:'badge-success',t:'回滚成功'},
+                    'rollback_failed': {c:'badge-danger',t:'回滚失败'}
+                };
+                var _e = _m[_s] || {c:'badge-default',t:v.status};
+                tbody.innerHTML += '<tr><td>' + escapeHtml(v.from_version || '-') + '</td><td>' + escapeHtml(v.release_version) + '</td><td><span class="badge ' + _e.c + '">' + _e.t + '</span></td><td>' + localTime(v.created_at) + '</td></tr>';
+            });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#888">暂无版本历史</td></tr>';
+        }
+        document.getElementById('deviceDetailModal').classList.add('show');
+    }).catch(function(e) { alert('加载设备详情失败: ' + e.message); });
+}
+function hideDeviceDetail() {
+    document.getElementById('deviceDetailModal').classList.remove('show');
+}
+function loadDevices() {
+    loadTable('/api/v1/devices/', 'devicesBody');
+}
+function renderRow(tr, d) {
+    var agentClass = d.agent_online ? 'badge-success' : 'badge-default';
+    var agentText = d.agent_online ? '在线' : '离线';
+    var robotClass = d.robot_online ? 'badge-success' : 'badge-default';
+    var robotText = d.robot_online ? '在线' : '离线';
+    var versionText = d.current_version && d.current_version !== '0.0.0' ? d.current_version : '-';
+    tr.innerHTML = '<td><code>' + escapeHtml(d.id) + '</code></td>' +
+        '<td>' + escapeHtml(d.agent_address) + '</td>' +
+        '<td>' + escapeHtml(versionText) + '</td>' +
+        '<td><span class="badge ' + agentClass + '">' + agentText + '</span></td>' +
+        '<td><span class="badge ' + robotClass + '">' + robotText + '</span></td>' +
+        '<td>' + localTime(d.last_heartbeat) + '</td>' +
+        '<td>' +
+            '<button class="btn btn-sm btn-primary" onclick="downloadAgent(\'' + d.id + '\')" title="下载 Agent 部署包">下载</button> ' +
+            '<button class="btn btn-sm" onclick="showAgentDeploy(\'' + d.id + '\')" title="通过 SSH 部署 Agent">部署</button> ' +
+            '<button class="btn btn-sm" onclick="showDeviceDetail(\'' + d.id + '\')" title="查看设备详情">详情</button> ' +
+            '<button class="btn btn-danger btn-sm" onclick="deleteDevice(\'' + d.id + '\')">删除</button></td>';
+}
+function startAgentDeploy() {
+    var host = document.getElementById('ad_host').value.trim();
+    var user = document.getElementById('ad_user').value.trim() || 'zoomlion';
+    var port = parseInt(document.getElementById('ad_port').value || '22', 10);
+    var password = document.getElementById('ad_password').value;
+    if (!host) { alert('请输入机器人地址'); return; }
+    if (!password) { alert('请输入 SSH / sudo 密码'); return; }
+    document.getElementById('ad_start_btn').disabled = true;
+    document.getElementById('ad_status_badge').textContent = '提交中...';
+    document.getElementById('ad_status_badge').className = 'badge badge-info';
+    apiFetch('/api/v1/devices/' + encodeURIComponent(currentDeployDeviceId) + '/agent-deployments', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            target_host: host,
+            ssh_user: user,
+            ssh_port: port,
+            password: password,
+            agent_root: document.getElementById('ad_agent_root').value.trim() || defaultAgentRoot
+        })
+    }).then(function(r) {
+        if (!r.ok) {
+            return r.json().then(function(err) { throw new Error(err.detail || '部署失败'); });
+        }
+        return r.json();
+    }).then(function(d) {
+        currentAgentDeployId = d.id;
+        document.getElementById('ad_status_badge').textContent = statusText(d.status);
+        document.getElementById('ad_status_badge').className = 'badge ' + (d.status === 'succeeded' ? 'badge-success' : d.status === 'failed' ? 'badge-danger' : 'badge-info');
+        pollAgentDeploy();
+        agentDeployTimer = setInterval(pollAgentDeploy, 2000);
+    }).catch(function(e) {
+        document.getElementById('ad_start_btn').disabled = false;
+        document.getElementById('ad_status_badge').textContent = '失败';
+        document.getElementById('ad_status_badge').className = 'badge badge-danger';
+        alert('启动部署失败: ' + e.message);
+    });
+}
+function pollAgentDeploy() {
+    if (!currentAgentDeployId) return;
+    apiFetch('/api/v1/agent-deployments/' + currentAgentDeployId).then(function(r) {
+        if (!r.ok) throw new Error('加载部署记录失败');
+        return r.json();
+    }).then(function(d) {
+        var s = d.status || '';
+        document.getElementById('ad_status_badge').textContent = statusText(s);
+        document.getElementById('ad_status_badge').className = 'badge ' + (s === 'succeeded' ? 'badge-success' : s === 'failed' ? 'badge-danger' : 'badge-info');
+        document.getElementById('ad_log').value = d.log || d.error || '';
+        var terminal = d.status === 'succeeded' || d.status === 'failed';
+        if (terminal && agentDeployTimer) {
+            clearInterval(agentDeployTimer);
+            agentDeployTimer = null;
+            loadDevices();
+        }
+    }).catch(function(e) {
+        document.getElementById('ad_log').value += '\n' + e.message;
+    });
+}
+function addDevice() {
+    var id = document.getElementById('f_id').value.trim();
+    if (!id) { alert('请输入设备 ID'); return; }
+    var host = document.getElementById('f_server_host').value.trim();
+    var port = document.getElementById('f_server_port').value.trim();
+    if (!host) { alert('请输入服务端地址'); return; }
+    if (!port) { alert('请输入服务端端口'); return; }
+    var serverUrl = 'http://' + host + ':' + port;
+    var payload = { id: id, server_url: serverUrl };
+    apiFetch('/api/v1/devices/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+    }).then(function(r) {
+        if (!r.ok) {
+            return r.json().then(function(err) { throw new Error(err.detail || '未知错误'); });
+        }
+        return r.json();
+    }).then(function(d) {
+        hideAddModal();
+        loadDevices();
+    }).catch(function(e) { alert('添加设备失败: ' + e.message); });
+}
+function downloadAgent(deviceId) {
+    var url = '/api/v1/devices/' + encodeURIComponent(deviceId) + '/deploy-package';
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'ota_agent-' + deviceId + '.tar.gz';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+function deleteDevice(id) {
+    if (!confirm('确定删除设备 ' + id + ' 吗？')) return;
+    apiFetch('/api/v1/devices/' + id, { method: 'DELETE' }).then(function(r) {
+        if (r.status === 204) { loadDevices(); }
+        else { throw new Error('删除失败'); }
+    }).catch(function(e) { alert('删除设备失败: ' + e.message); });
+}
+loadDevices();
+</script>
+{% endblock %}

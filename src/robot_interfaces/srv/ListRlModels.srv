@@ -1,0 +1,13 @@
+---
+# 查询是否成功。
+bool success
+# 成功或失败的说明。
+string message
+# 当前节点实际用于 artifact 选择的系统架构，例如 x86_64、aarch64。
+string runtime_platform
+# 启动时要求加载的默认模型名称。
+string default_model_name
+# 当前 active 模型名称。
+string active_model_name
+# 当前平台实际注册成功的模型列表。
+RlModelInfo[] models
