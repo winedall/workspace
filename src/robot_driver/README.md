@@ -49,6 +49,12 @@ RobotDriverNode (ROS 2 节点, MultiThreadedExecutor 2 线程)
 | **Srv** | `driver/mix/set_zero` | 按关节名设置混装 CANFD 电机零点 |
 | **Srv** | `driver/mix/query_motor_id` | 按关节名查询混装 CANFD 电机 ID |
 | **Srv** | `driver/mix/set_motor_id` | 按关节名修改混装 CANFD 电机 ID |
+| **Srv** | `driver/tienkung/query_status` | 按关节名查询天工关节状态 |
+| **Srv** | `driver/tienkung/set_zero` | 按关节名设置天工电机零点 |
+| **Srv** | `driver/tienkung/modify_id` | 按关节名修改天工电机 ID |
+| **Srv** | `driver/tienkung/query_id` | 广播查询天工电机 ID |
+| **Srv** | `driver/tienkung/reset_id` | 广播重置天工电机 ID |
+| **Srv** | `driver/tienkung/query_mcu_id` | 按关节名发送 0x05 查询帧，原样回传电机 MCU ID 应答数据 |
 
 Encos、Tienkung 和 Mix 的关节级维护接口均以 `joint_name` 定位关节；`slave_id`、`passage`、`canfd.bus` 等拓扑字段只保存在硬件配置 YAML 中，由 backend 解析。
 

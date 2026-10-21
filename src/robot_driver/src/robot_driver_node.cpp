@@ -171,6 +171,12 @@ RobotDriverNode::RobotDriverNode(const rclcpp::NodeOptions & options)
     std::bind(&RobotDriverNode::handleTienkungModifyID, this, std::placeholders::_1, std::placeholders::_2),
     rmw_qos_profile_services_default,
     admin_callback_group_);
+  // 查询Tienkung电机 MCU ID 服务。
+  tienkung_query_mcu_id_srv_ = create_service<robot_interfaces::srv::TienkungQueryMcuId>(
+    "driver/tienkung/query_mcu_id",
+    std::bind(&RobotDriverNode::handleTienkungQueryMcuId, this, std::placeholders::_1, std::placeholders::_2),
+    rmw_qos_profile_services_default,
+    admin_callback_group_);
   // 获取Tienkung电机 ID 服务。
   tienkung_query_id_srv_ = create_service<robot_interfaces::srv::TienkungQueryID>(
     "driver/tienkung/query_id",
@@ -455,6 +461,26 @@ void RobotDriverNode::handleTienkungModifyID(
   response->motor_id = result.motor_id;
   response->new_motor_id = result.new_motor_id;
   response->feedback_code = result.feedback_code;
+}
+
+// 处理天工查询 MCU ID 服务。
+void RobotDriverNode::handleTienkungQueryMcuId(
+  const std::shared_ptr<robot_interfaces::srv::TienkungQueryMcuId::Request> request,
+  std::shared_ptr<robot_interfaces::srv::TienkungQueryMcuId::Response> response)
+{
+  auto * tienkung_backend = dynamic_cast<TienkungBackend *>(backend_.get());
+  if (tienkung_backend == nullptr) {
+    response->success = false;
+    response->message = "active backend does not support Tienkung admin services";
+    return;
+  }
+  const auto result = tienkung_backend->queryMcuId(request->joint_name, adminTimeout(request->timeout_sec));
+  response->success = result.success;
+  response->message = result.success ? "tienkung query mcu id completed" : result.message;
+  response->motor_id = result.motor_id;
+  response->resp_can_id = result.resp_can_id;
+  response->resp_dlc = result.resp_dlc;
+  response->resp_data = result.resp_data;
 }
 
 // 处理天工查询 ID 服务。

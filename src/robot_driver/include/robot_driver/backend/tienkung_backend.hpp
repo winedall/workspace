@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "robot_driver/backend/hardware_backend.hpp"
 #include "robot_driver/ethercat/ethercat_master.hpp"
@@ -14,6 +15,20 @@
 
 namespace robot_driver
 {
+
+// 天工 MCU ID 查询事务的原始应答结果。
+//
+// 0x05 查询帧的应答不做厂家协议解析，直接把电机返回的 CAN-FD 帧
+// 元信息与数据区原样携带，供上层诊断展示。
+struct TienkungRawFrameResult
+{
+  bool success{false};
+  std::string message;
+  std::uint16_t motor_id{0};
+  std::uint32_t resp_can_id{0};
+  std::uint8_t resp_dlc{0};
+  std::vector<std::uint8_t> resp_data;
+};
 
 // 天工 EtherCAT 后端。
 //
@@ -35,6 +50,8 @@ public:
   TienkungAdminResult setZero(const std::string & joint_name, double timeout_sec);
   // 修改指定关节的电机 ID。
   TienkungAdminResult modifyID(const std::string & joint_name, std::uint8_t new_motor_id, double timeout_sec);
+  // 向指定关节电机发送 0x05 查询帧，原样回传电机应答数据。
+  TienkungRawFrameResult queryMcuId(const std::string & joint_name, double timeout_sec);
   // 广播查询所有电机 ID。
   TienkungAdminResult queryID(double timeout_sec);
   // 广播重置所有电机 ID 为出厂默认值。

@@ -100,6 +100,17 @@
 | `MixQueryMotorId` | 按 `joint_name` 查询混装 CANFD 电机 ID |
 | `MixSetMotorId` | 按 `joint_name` 修改混装 CANFD 电机 ID |
 
+### Tienkung 电机维护（低频管理命令）
+
+| 服务 | 用途 |
+|------|------|
+| `TienkungQueryStatus` | 按 `joint_name` 查询天工关节状态 |
+| `TienkungSetZero` | 按 `joint_name` 设置天工电机零点 |
+| `TienkungModifyID` | 按 `joint_name` 修改天工电机 ID |
+| `TienkungQueryID` | 广播查询天工电机 ID |
+| `TienkungResetID` | 广播重置天工电机 ID |
+| `TienkungQueryMcuId` | 按 `joint_name` 发送 `0x05` 查询帧，原样带回电机 MCU ID 应答数据 |
+
 ## 构建
 
 ```bash

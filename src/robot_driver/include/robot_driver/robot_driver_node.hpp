@@ -19,6 +19,7 @@
 #include "robot_interfaces/srv/mix_set_zero.hpp"
 #include "robot_interfaces/srv/tienkung_modify_id.hpp"
 #include "robot_interfaces/srv/tienkung_query_id.hpp"
+#include "robot_interfaces/srv/tienkung_query_mcu_id.hpp"
 #include "robot_interfaces/srv/tienkung_query_status.hpp"
 #include "robot_interfaces/srv/tienkung_reset_id.hpp"
 #include "robot_interfaces/srv/tienkung_set_zero.hpp"
@@ -86,6 +87,9 @@ private:
   void handleTienkungModifyID(
     const std::shared_ptr<robot_interfaces::srv::TienkungModifyID::Request> request,
     std::shared_ptr<robot_interfaces::srv::TienkungModifyID::Response> response);
+  void handleTienkungQueryMcuId(
+    const std::shared_ptr<robot_interfaces::srv::TienkungQueryMcuId::Request> request,
+    std::shared_ptr<robot_interfaces::srv::TienkungQueryMcuId::Response> response);
   void handleTienkungQueryID(
     const std::shared_ptr<robot_interfaces::srv::TienkungQueryID::Request> request,
     std::shared_ptr<robot_interfaces::srv::TienkungQueryID::Response> response);
@@ -132,6 +136,7 @@ private:
   rclcpp::Service<robot_interfaces::srv::TienkungQueryStatus>::SharedPtr tienkung_query_status_srv_;
   rclcpp::Service<robot_interfaces::srv::TienkungSetZero>::SharedPtr tienkung_set_zero_srv_;
   rclcpp::Service<robot_interfaces::srv::TienkungModifyID>::SharedPtr tienkung_modify_id_srv_;
+  rclcpp::Service<robot_interfaces::srv::TienkungQueryMcuId>::SharedPtr tienkung_query_mcu_id_srv_;
   rclcpp::Service<robot_interfaces::srv::TienkungQueryID>::SharedPtr tienkung_query_id_srv_;
   rclcpp::Service<robot_interfaces::srv::TienkungResetID>::SharedPtr tienkung_reset_id_srv_;
   // 周期发布定时器。

@@ -179,6 +179,22 @@ bool TienkungProtocol::encodeSetZero(
   return true;
 }
 
+// 编码天工 0x05 查询 MCU ID 帧。
+//
+// 该帧与置零帧同样使用 dlc=1、CAN id=电机 id，仅把命令码换成 0x05；
+// 电机侧应答帧的解析由 backend 原样回传，不在协议层解释。
+bool TienkungProtocol::encodeQueryMcuId(
+  const HardwareJointConfig & hardware_joint,
+  CanfdFrame & frame,
+  std::string & error) const
+{
+  prepareJointFrame(hardware_joint, frame);
+  frame.length = 1;
+  frame.data[0] = 0x05;
+  (void)error;
+  return true;
+}
+
 // 编码天工 0x02 修改电机 ID 帧。
 //
 // 帧中同时携带旧 ID 和新 ID，用于电机侧确认修改目标。

@@ -149,7 +149,7 @@ def _build_launch_context() -> dict:
     )
     expr_default_model = PythonExpression(
         # ["'t4_walk' if 'humanoid' == '", arg_robot_type, "' else 'd4_flat'"]
-        ["'z01_pa_walk' if 'humanoid' == '", arg_robot_type, "' else 'd4_flat'"]
+         ["'z01_pa_walk' if 'humanoid' == '", arg_robot_type, "' else 'd4_flat'"]
         # ["'z01_std_walk' if 'humanoid' == '", arg_robot_type, "' else 'd4_flat'"]
     )
     # 内部路径和 include launch 文件。

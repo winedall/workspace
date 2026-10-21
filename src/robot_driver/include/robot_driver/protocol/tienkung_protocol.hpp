@@ -68,6 +68,8 @@ public:
   bool encodeDisable(const HardwareJointConfig & hardware_joint, CanfdFrame & frame, std::string & error) const;
   // 编码置零帧。
   bool encodeSetZero(const HardwareJointConfig & hardware_joint, CanfdFrame & frame, std::string & error) const;
+  // 编码查询 MCU ID 帧（dlc=1、id=电机 id、data[0]=0x05）。
+  bool encodeQueryMcuId(const HardwareJointConfig & hardware_joint, CanfdFrame & frame, std::string & error) const;
   // 编码修改 ID 帧。
   bool encodeModifyId(const HardwareJointConfig & hardware_joint, std::uint8_t new_id, CanfdFrame & frame, std::string & error) const;
   // 编码广播查询 ID 帧。

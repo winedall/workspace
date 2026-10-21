@@ -1,0 +1,15 @@
+# Tienkung 配置命令：向指定关节电机发送查询 MCU ID 帧。
+# 请求帧固定 dlc=1、CAN id=电机 id、数据区第 1 字节=0x05；
+# 电机返回的应答帧不做协议解析，原始数据通过 resp_* 字段原样带回。
+# timeout_sec <= 0 时由 robot_driver 使用默认超时时间。
+string joint_name
+float32 timeout_sec
+---
+# success=false 可能表示超时、backend 不支持、EtherCAT 故障或未收到有效应答帧。
+bool success
+string message
+uint16 motor_id
+# 电机应答帧的原始内容，未做厂家协议解析。
+uint32 resp_can_id
+uint8 resp_dlc
+uint8[] resp_data

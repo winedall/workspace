@@ -483,6 +483,28 @@ call_tienkung_query_id() {
         "{timeout_sec: 1.0}"
 }
 
+call_tienkung_query_mcu_id() {
+    local joint_name="$1"
+    service_call_with_retry "Tienkung 查询 MCU ID(${joint_name})" "success=True" \
+        ros2 service call /robot/driver/tienkung/query_mcu_id \
+        robot_interfaces/srv/TienkungQueryMcuId \
+        "{joint_name: '${joint_name}', timeout_sec: 1.0}"
+}
+
+# 从 service 回包文本里提取 resp_data 十进制字节列表，转成十六进制原样打印。
+format_mcu_id_hex() {
+    local output="$1"
+    local arr
+    arr="$(grep -oE 'resp_data=\[[^]]*\]' <<< "${output}" | tail -1 || true)"
+    [[ -z "${arr}" ]] && return 1
+    arr="${arr#resp_data=}"
+    python3 - "${arr}" <<'PY'
+import sys, re
+nums = [int(x) for x in re.findall(r'\d+', sys.argv[1])]
+print(' '.join(f'{n:02X}' for n in nums))
+PY
+}
+
 call_encos_get_motor_id() {
     local joint_name="$1"
     service_call_with_retry "Encos 读取电机 ID(${joint_name})" "success=True" \
@@ -867,6 +889,42 @@ action_read_motor_id() {
     read -r -p "按回车继续..."
 }
 
+action_query_mcu_id() {
+    echo -e "${CYAN}=============================================${NC}"
+    echo -e "       查询电机 MCU ID (0x05)"
+    echo -e "${CYAN}=============================================${NC}"
+
+    local vendor_profile
+    vendor_profile="$(profile_vendor)"
+
+    # 0x05 MCU ID 查询只在 Tienkung/EtherCAT 后端（tienkung profile）可用。
+    if [[ "${vendor_profile}" != "tienkung" ]]; then
+        log_warn "查询 MCU ID 仅支持 tienkung (EtherCAT) profile，当前: ${HARDWARE_PROFILE}"
+        echo
+        read -r -p "按回车继续..."
+        return
+    fi
+
+    while true; do
+        local line name
+        if ! line=$(select_joint "选择关节查询 MCU ID (q 返回)"); then return; fi
+        name=$(echo "${line}" | cut -d'|' -f2)
+
+        echo -e "${CYAN}=============================================${NC}"
+        echo -e "       ${name} 查询 MCU ID"
+        echo -e "${CYAN}=============================================${NC}"
+        if call_tienkung_query_mcu_id "${name}"; then
+            local hex
+            if hex="$(format_mcu_id_hex "${MOTOR_LAST_CALL_OUTPUT}")"; then
+                echo -e "${CYAN}[MCU-ID HEX]${NC} ${hex}"
+            fi
+        else
+            log_warn "查询 MCU ID 失败，可在当前菜单重试"
+        fi
+        echo
+    done
+}
+
 action_batch_read_position() {
     log_step "批量读取关节位置..."
 
@@ -952,6 +1010,7 @@ main_loop() {
         echo -e "  ${GREEN}3.${NC} 📋 批量读取关节位置"
         echo -e "  ${GREEN}4.${NC} 🔄 批量设置关节标零 (需确认)"
         echo -e "  ${GREEN}5.${NC} 🆔 读取电机 ID (广播查询)"
+        echo -e "  ${GREEN}6.${NC} 🔎 查询电机 MCU ID (0x05)"
         echo -e "  ${RED}q.${NC} 退出程序"
         echo -e "${CYAN}=============================================${NC}"
         echo -n "请选择功能: "
@@ -963,6 +1022,7 @@ main_loop() {
             3) action_batch_read_position ;;
             4) action_batch_set_zero ;;
             5) action_read_motor_id ;;
+            6) action_query_mcu_id ;;
             q|Q) log_info "退出程序"; exit 0 ;;
             *) log_error "无效选项"; sleep 1 ;;
         esac

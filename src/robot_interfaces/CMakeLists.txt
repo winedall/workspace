@@ -53,6 +53,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/TienkungModifyID.srv"
   "srv/TienkungQueryID.srv"
   "srv/TienkungResetID.srv"
+  "srv/TienkungQueryMcuId.srv"
   DEPENDENCIES builtin_interfaces std_msgs action_msgs
 )
 

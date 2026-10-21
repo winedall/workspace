@@ -596,6 +596,50 @@ $ ./scripts/motor.sh --vendor mix
 
 ---
 
+### 3.7b 单电机运动调试工具 (motor_motion.sh)
+
+`motor_motion.sh` + `motor_motion.py` 是 `motor.sh` 的运动补充版：以**运控模式** (`config_mode=false`) 单独拉起 `robot_driver`，按编号选择一个关节，直接向 `/robot/control/hardware_commands` 下发 `JointCommands` 全量帧，绕过 router/control 对单个电机做台架运动测试。
+
+> **⚠ 安全警告**
+> - 同一时刻**只使能一个关节**，其余关节每帧显式 `enable=false` 断使能 —— **站立的机器人会立即倾倒**，必须吊机/台架固定、脚不承重。
+> - 目标位置按限速 (默认 0.3 rad/s) 平滑爬升，避免命令阶跃被 kp 放大成冲击；默认 kp=30/kd=1，不建议超过 50。
+> - 退出 (q / Ctrl+C / EOF) 前会自动发布全关帧；driver 缓存的最后一帧是全 disable，不会残留运动命令。
+> - 需要 `robot_driver` 二进制已 setcap (`sudo setcap cap_sys_nice=ep install/robot_driver/lib/robot_driver/robot_driver_node`)，脚本会检测并告警。
+
+#### 使用方法
+
+```bash
+# tienkung 真机单电机调试（自动拉起运控模式 driver，交互前需吊机确认）
+./scripts/motor_motion.sh
+
+# 指定硬件配置 / 机器人类型 / 命令帧频率
+./scripts/motor_motion.sh --profile encos --rate 100
+
+# 复用已运行的 robot_driver，不自行拉起
+./scripts/motor_motion.sh --no-driver
+
+# 无硬件走一遍交互菜单
+./scripts/motor_motion.sh --dry-run
+```
+
+#### 子菜单命令速查
+
+| 命令 | 功能 |
+|------|------|
+| `<编号>` | 选择关节（自动断开上一个使能中的关节），编号与 motor.sh 一致，来自 robot_joints_*.yaml 顺序 |
+| `e` | 使能选中关节并保持在当前反馈位置（无反馈时拒绝使能） |
+| `g <rad>` | 绝对位置运动，自动限幅到 min_pos/max_pos，未使能时先自动使能 |
+| `r <rad>` | 相对位置运动 |
+| `s <rad/s>` | 设置运动速度（上限受关节 max_vel 限制） |
+| `p <kp> <kd>` | 设置 PD 增益 |
+| `d` | 断使能选中关节 |
+| `c` / `l` | 查看反馈 / 关节列表 |
+| `q` | 退出（先发全关帧） |
+
+> **实现要点**：环境与 run.sh 对齐（ROS_DOMAIN_ID=10、CycloneDDS localhost、`/robot` namespace）；QoS 与 driver 的 SensorDataQoS 匹配 (best_effort/keep_last=2)；位置命令使用逻辑关节空间 rad，单位换算/方向/零位由 robot_driver 后端处理。首次收到命令时 tienkung 后端会对 enable_default=true 的关节做一次使能握手再按帧清槽，属预期行为。
+
+---
+
 ### 3.8 音频播报（robot_audio_node）
 
 `robot_audio_node` 通过 topic **`audio/request`** 接收统一音频请求，消息类型 **`robot_interfaces/msg/AudioRequest`**。

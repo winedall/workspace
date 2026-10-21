@@ -43,7 +43,7 @@ hardware:
     # 腰部
     - {name: waist_pitch, motor_id: 31, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 2, bus: 1, slot: 1, kt: 1.572}}
     - {name: waist_roll, motor_id: 32, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 2, bus: 1, slot: 2, kt: 1.572}}
-    - {name: waist_yaw, motor_id: 33, direction: -1, offset: -145.0, ratio: 1.0, tienkung: {slave_id: 2, bus: 1, slot: 0, kt: 3.5}}
+    - {name: waist_yaw, motor_id: 33, direction: -1, offset: -143.5, ratio: 1.0, tienkung: {slave_id: 2, bus: 1, slot: 0, kt: 3.5}}
     # 左腿
     - {name: left_hip_pitch, motor_id: 41, direction: +1, offset: 0.0, ratio: 1.0, tienkung: {slave_id: 3, bus: 0, slot: 0, kt: 3.5}}
     - {name: left_hip_roll, motor_id: 42, direction: +1, offset: 30.0, ratio: 1.0, tienkung: {slave_id: 3, bus: 0, slot: 1, kt: 3.5}}
