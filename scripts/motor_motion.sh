@@ -12,7 +12,6 @@
 # 用法: ./motor_motion.sh [--profile encos|tienkung|mix_canfd|mix_ethercat]
 #                         [--type humanoid] [--config PATH]
 #                         [--rate HZ] [--no-driver] [--dry-run]
-#                         [--batch 编号1 编号2 ...]   # 非交互批量使能
 
 set -eo pipefail
 
@@ -25,7 +24,6 @@ HARDWARE_PROFILE="tienkung"
 MOTION_RATE="50"
 NO_DRIVER=0
 DRY_RUN=0
-BATCH_ARGS=""
 DRIVER_PID=""
 DRIVER_LOG_FILE="/tmp/motor_motion_driver.log"
 CLEANED_UP=0
@@ -52,9 +50,6 @@ usage() {
       --rate HZ         命令帧发布频率 (默认: 50)
       --no-driver       复用已在运行的 robot_driver，不自行拉起
       --dry-run         不启动 driver、不连接 ROS，仅演示交互菜单
-      --batch IDS...    非交互批量使能模式：空格分隔的关节列表编号，全部保持当前位置，
-                        Ctrl+C 退出时自动断使能 (例: --batch 6 7 14 15)
-      --batch-ids IDS...同上，但按 hw_*.yaml 里的电机 motor_id 指定 (例: --batch-ids 16 17 26 27)
   -h, --help            显示帮助
 
 示例:
@@ -72,10 +67,6 @@ while [[ $# -gt 0 ]]; do
         --rate)                MOTION_RATE="${2:-}"; shift 2 ;;
         --no-driver)           NO_DRIVER=1; shift ;;
         --dry-run)             DRY_RUN=1; NO_DRIVER=1; shift ;;
-        --batch)               BATCH_ARGS="--batch"; shift
-                               while [[ $# -gt 0 && ! "$1" =~ ^- ]]; do BATCH_ARGS="${BATCH_ARGS} $1"; shift; done ;;
-        --batch-ids)           BATCH_ARGS="--batch-ids"; shift
-                               while [[ $# -gt 0 && ! "$1" =~ ^- ]]; do BATCH_ARGS="${BATCH_ARGS} $1"; shift; done ;;
         -h|--help)             usage; exit 0 ;;
         *) log_error "未知参数: $1"; usage; exit 1 ;;
     esac
@@ -229,7 +220,6 @@ main() {
         --joints-config "${JOINTS_CONFIG}" \
         --hw-config "${HARDWARE_CONFIG}" \
         --rate "${MOTION_RATE}" \
-        ${BATCH_ARGS:+${BATCH_ARGS}} \
         $([[ "${DRY_RUN}" -eq 1 ]] && echo "--dry-run")
 }
 

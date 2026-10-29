@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import copy
 import importlib
 import math
 import time
@@ -117,58 +116,6 @@ class OutputSmoother:
             self._old_kds = None
 
 
-class CommandInterpolator:
-    """把 50Hz 推理命令在 200Hz 发布周期内做线性插值，消除零阶保持位置阶跃。
-
-    背景：推理 50Hz 产生一次命令，发布定时器 200Hz 原样重发（零阶保持），
-    于是策略相邻两帧的位置差会作为瞬时阶跃直达电机（踝关节尤其明显），
-    诱发“命令突跳→力矩塌零→机体倾斜”。本类在发布周期内把上一帧实际发布
-    位置线性逼近到最新目标位置，将单帧阶跃摊平成多帧斜坡。
-
-    只对 position 插值；kp/kd/enable/type/velocity 等语义字段一律沿用最新
-    目标帧，不改变控制语义。若中途来了新目标，则以“当前已发布位置”为新起点
-    重新规划，保证输出连续。
-    """
-
-    def __init__(self, total_frames: int) -> None:
-        self._total = max(1, int(total_frames))
-        self._start: list[float] | None = None
-        self._target: list[float] | None = None
-        self._frame = 0
-        self._published: list[float] | None = None
-
-    def set_target(self, positions: list[float]) -> None:
-        """收到新的推理目标：以最近一次实际发布位置为起点规划插值段。"""
-        self._start = list(self._published) if self._published is not None else list(positions)
-        self._target = list(positions)
-        self._frame = 0
-
-    def next_positions(self) -> list[float] | None:
-        """返回当前发布帧应输出的位置；尚未设置目标时返回 None。"""
-        if self._start is None or self._target is None:
-            return None
-        if len(self._start) != len(self._target):
-            return list(self._target)
-        self._frame += 1
-        alpha = self._frame / self._total
-        if alpha > 1.0:
-            alpha = 1.0
-        out = [s + (t - s) * alpha for s, t in zip(self._start, self._target)]
-        self._published = out
-        return out
-
-    def mark_published(self, positions: list[float]) -> None:
-        """零阶路径（如 TYPE_PREPARE）下同步基线，保证下一段插值从实际发布位置起步。"""
-        self._published = list(positions)
-
-    def reset(self) -> None:
-        """清空插值状态（模型切换/停止等场景可调用）。"""
-        self._start = None
-        self._target = None
-        self._frame = 0
-        self._published = None
-
-
 class RobotRlManagerNode(Node):
     """管理 RL 模型元数据，并周期发布 policy backend 的期望关节命令。"""
 
@@ -191,10 +138,6 @@ class RobotRlManagerNode(Node):
         self._inference_frequency_hz = float(self.declare_parameter("inference_frequency_hz", 50.0).value)
         self._command_publish_frequency_hz = float(self.declare_parameter("command_publish_frequency_hz", 200.0).value)
         self._status_publish_frequency_hz = float(self.declare_parameter("status_publish_frequency_hz", 1.0).value)
-        # A1：命令发布插值（消除 50Hz→200Hz 零阶保持位置阶跃）。默认开启；
-        # command_interpolation_frames<=0 时按 发布频率/推理频率 自动取整（200/50=4）。
-        self._command_interpolation_enabled = bool(self.declare_parameter("enable_command_interpolation", True).value)
-        self._command_interpolation_frames = int(self.declare_parameter("command_interpolation_frames", 0).value)
         self._onnx_runtime_options = {
             "intra_op_num_threads": int(self.declare_parameter("onnx_intra_op_num_threads", 2).value),
             "inter_op_num_threads": int(self.declare_parameter("onnx_inter_op_num_threads", 1).value),
@@ -261,13 +204,6 @@ class RobotRlManagerNode(Node):
         self._external_cmd_vel_time_sec: Optional[float] = None
         self._stop_active = False
         self._smoother = OutputSmoother()
-        # A1：命令发布插值器（线性插值 50Hz 目标到 200Hz 发布周期）。
-        if self._command_interpolation_frames > 0:
-            _interp_frames = self._command_interpolation_frames
-        else:
-            _interp_frames = int(round(self._command_publish_frequency_hz / max(self._inference_frequency_hz, 1.0)))
-        self._command_interpolator = CommandInterpolator(max(1, _interp_frames))
-        self._interp_publish_msg: Optional[JointCommands] = None
         self._latest_state = RobotState()
         self._latest_state.state = RobotState.STATE_BOOTING
         self._action_audio_enabled = False
@@ -949,45 +885,17 @@ class RobotRlManagerNode(Node):
             self._switch_to_model(default_model)
 
     def _handle_command_publish_timer(self) -> None:
-        """按指令发布周期发布最近一次有效 RL 候选命令。
-
-        A1：TYPE_RUN 命令在发布周期内做线性插值（消除 50Hz 零阶保持阶跃）；
-        其余类型（如 TYPE_PREPARE）保持原有零阶发布语义，由 robot_control 侧
-        的准备插值负责平滑。
-        """
+        """按指令发布周期重复发布最近一次有效 RL 候选命令。"""
         if not self._should_publish_commands() or self._latest_commands is None:
             return
         self._command_sequence = int(self._command_sequence) + 1
-
-        interpolate = (
-            self._command_interpolation_enabled
-            and self._interp_publish_msg is not None
-            and self._latest_commands.type == JointCommands.TYPE_RUN
-        )
-        if interpolate:
-            positions = self._command_interpolator.next_positions()
-            if positions is None:
-                interpolate = False
-            else:
-                for i, cmd in enumerate(self._interp_publish_msg.commands):
-                    if i < len(positions):
-                        cmd.position = positions[i]
-
-        if interpolate:
-            out = self._interp_publish_msg
-        else:
-            out = self._latest_commands
-            # 零阶路径同步插值基线，保证下一段插值从实际发布位置起步。
-            if self._command_interpolation_enabled:
-                self._command_interpolator.mark_published([float(c.position) for c in out.commands])
-        out.sequence = self._command_sequence
-        out.header.stamp = self.get_clock().now().to_msg()
-        self._commands_pub.publish(out)
+        self._latest_commands.sequence = self._command_sequence
+        self._latest_commands.header.stamp = self.get_clock().now().to_msg()
+        self._commands_pub.publish(self._latest_commands)
 
         # 判断命令是否只允许发布一次
         if self._latest_commands.type == JointCommands.TYPE_PREPARE:
             self._latest_commands = None
-            self._interp_publish_msg = None
 
     def _handle_status_timer(self) -> None:
         """按低频周期发布 RL 管理状态。"""
@@ -1099,10 +1007,6 @@ class RobotRlManagerNode(Node):
         commands.ankle_in_series = self._model_registry.active_model.ankle_in_series
         self._smoother.filter(commands)
         self._latest_commands = commands
-        # A1：为新目标准备发布副本并规划插值段（只对 TYPE_RUN 生效，见发布定时器）。
-        if self._command_interpolation_enabled:
-            self._interp_publish_msg = copy.deepcopy(commands)
-            self._command_interpolator.set_target([float(c.position) for c in commands.commands])
 
     def _make_status_msg(self) -> RlManagerStatus:
         """构造 RlManagerStatus，便于单元测试和节点发布复用。"""
