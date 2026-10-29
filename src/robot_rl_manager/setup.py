@@ -18,6 +18,7 @@ setup(
         package_name: ['convert/*.yaml', 'replay/*.yaml'],
     },
     install_requires=['setuptools', 'PyYAML', 'numpy', 'cv_bridge'],
+    tests_require=['pytest'],
     zip_safe=True,
     maintainer='TODO',
     maintainer_email='maintainer@example.com',

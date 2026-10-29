@@ -1,7 +1,8 @@
 /**:
   ros__parameters:
     inference_frequency_hz: 50.0           # 策略推理循环频率，单位 Hz
-    command_publish_frequency_hz: 200.0    # 关节指令发布频率，单位 Hz（高于推理频率实现插值）
+    command_publish_frequency_hz: 400.0    # 关节指令发布频率，单位 Hz（高于推理频率实现插值）
+    enable_command_interpolation: false    # 暂时关闭命令位置插值，恢复零阶保持发布
     status_publish_frequency_hz: 10.0      # RL Manager 状态发布频率，单位 Hz
     onnx_intra_op_num_threads: 2           # ONNXRuntime 单次算子内部线程数，0 表示使用运行库默认值
     onnx_inter_op_num_threads: 1           # ONNXRuntime 算子间并行线程数，0 表示使用运行库默认值
@@ -11,7 +12,7 @@
     rknn_core_mask: 7                      # RKNNLite NPU core mask，7 表示使用 NPU_CORE_0|1|2
     prepare_profiles_config: ""            # 准备姿态配置文件路径，launch 默认注入 config/<robot_type>/default_prepare.yaml
     default_prepare_profile: stand         # 默认准备姿态名称
-    enable_model_input_dump: false         # 是否在 build_model_input 后把序列样本写入 config/data/samples
+    enable_model_input_dump: false          # 是否在 build_model_input 后把序列样本写入 config/data/samples
     model_input_dump_mode: always          # 序列录制模式：time / frames / always
     model_input_dump_max_seconds: 0.0      # time 模式下的最长录制时间，单位秒
     model_input_dump_max_frames: 0         # frames 模式下的最长录制帧数
