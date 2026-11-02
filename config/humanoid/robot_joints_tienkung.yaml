@@ -21,16 +21,16 @@ robot_joints:
     - {name: left_shoulder_yaw, group: left_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
     - {name: left_elbow, group: left_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
     - {name: left_wrist_yaw, group: left_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
-    - {name: left_wrist_pitch, group: left_arm, enable_default: false, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
-    - {name: left_wrist_roll, group: left_arm, enable_default: false, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: left_wrist_pitch, group: left_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: left_wrist_roll, group: left_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
     # 右臂
     - {name: right_shoulder_pitch, group: right_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
     - {name: right_shoulder_roll, group: right_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
     - {name: right_shoulder_yaw, group: right_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
     - {name: right_elbow, group: right_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
     - {name: right_wrist_yaw, group: right_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
-    - {name: right_wrist_pitch, group: right_arm, enable_default: false, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
-    - {name: right_wrist_roll, group: right_arm, enable_default: false, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: right_wrist_pitch, group: right_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
+    - {name: right_wrist_roll, group: right_arm, enable_default: true, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
     # 腰部
     - {name: waist_pitch, group: waist, enable_default: false, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}
     - {name: waist_roll, group: waist, enable_default: false, unit: rad, min_pos: -3.14, max_pos: 3.14, max_vel: 3.0, max_effort: 80.0}

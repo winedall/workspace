@@ -10,6 +10,12 @@ backup/
 logs/
 *.log
 
+# ===== Qoder IDE 缓存 =====
+.qoder/
+
+# ===== 本地测试数据(大体积,不进版本控制) =====
+config/data/samples/
+
 # ===== ROS 2 bag / 录制数据 =====
 *.db3
 *.db3-wal
